@@ -52,4 +52,4 @@ while deck.cards:
         print("You have chosen to break the loop. Goodbye :)")
         break
     else:
-        print("You entered an incorrect value for your response. \nPlease try again.")
+        print("\033[1;31;40mYou entered an incorrect value for your response. \nPlease try again.\033[0m")
