@@ -78,4 +78,4 @@ while initial_prompt.lower() == "h":
         break
     else:
         print("\n")
-        print("\033[1;31;40mYou entered an incorrect value for your response. \nPlease try again.\033[0m")
+        print("\033[1;31;40mYou entered an incorrect value for your response. Please try again.\033[0m")
