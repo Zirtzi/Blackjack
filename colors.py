@@ -1,6 +1,0 @@
-print("\033[1;31;40m Red Text \033[0m")
-print("\033[1;32;40m Green Text \033[0m")
-print("\033[1;33;40m Yellow Text \033[0m")
-print("\033[1;34;40m Blue Text \033[0m")
-print("\033[1;35;40m Magenta Text \033[0m")
-print("\033[1;36;40m Cyan Text \033[0m")

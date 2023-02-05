@@ -43,7 +43,7 @@ class Deck:
         return f"Deck of {len(self.cards)} cards"
 
 # Initialization of deck as well as shuffle
-for i in range(5):
+for i in range(1):
     # Initialization of deck as well as shuffle
     deck = Deck()
     deck.shuffle()
