@@ -64,7 +64,7 @@ class Deck:
 
 # Initialization of deck as well as shuffle
 counter = 0
-for i in range(100):
+for i in range(1000):
     counter += 1
     # Initialization of deck as well as shuffle
     deck = Deck()
@@ -72,18 +72,9 @@ for i in range(100):
 
     # Printing the deck one time as a safety way to make sure cards are being dealt in the right order
     deck.deal_cards()
+    print(f"Current deck dealing # - {counter}")
 
     # Deal and show hands of player
     init_deal(deck, player_hand, dealer_hand)
-    print(f"{players[0]} parameter check:"
-          f" [\033[1;32;40mValue\033[0m = \033[1;31;40m{check_same_value(player_hand)}\033[0m, "
-          f" \033[1;32;40mSuit\033[0m = \033[1;31;40m{check_same_suit(player_hand)}\033[0m,"
-          f" \033[1;32;40mRank\033[0m = \033[1;31;40m{check_same_rank(player_hand)}\033[0m, "
-          f" \033[1;32;40mBlackjack\033[0m = \033[1;31;40m{check_for_blackjack(player_hand)}\033[0m]")
-    print(f"{players[-1]} parameter check:"
-          f" [\033[1;32;40mValue\033[0m = \033[1;31;40m{check_same_value(dealer_hand)}\033[0m, "
-          f" \033[1;32;40mSuit\033[0m = \033[1;31;40m{check_same_suit(dealer_hand)}\033[0m,"
-          f" \033[1;32;40mRank\033[0m = \033[1;31;40m{check_same_rank(dealer_hand)}\033[0m, "
-          f" \033[1;32;40mBlackjack\033[0m = \033[1;31;40m{check_for_blackjack(dealer_hand)}\033[0m]")
     player_hand.clear()
     dealer_hand.clear()
