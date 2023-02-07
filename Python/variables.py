@@ -1,3 +1,4 @@
+import random
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Arrays ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 # Creating suits and ranks for cards
 suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
@@ -9,6 +10,68 @@ players = ["Player 1", "Dealer"]
 # Player hands
 player_hand = []
 dealer_hand = []
+
+# ----- ----- ----- ----- ----- ----- ----- ----- ----- Classes ----- ----- ----- ----- ----- ----- ----- ----- ----- #
+class Card:
+    def __init__(self, suit, rank, card_value = None):
+        self.suit = suit
+        self.rank = rank
+        self.card_value = card_value
+
+    def value_of_card(self):
+        if self.rank == "Ace":
+            return 11
+        if self.rank == "2":
+            return 2
+        if self.rank == "3":
+            return 3
+        if self.rank == "4":
+            return 4
+        if self.rank == "5":
+            return 5
+        if self.rank == "6":
+            return 6
+        if self.rank == "7":
+            return 7
+        if self.rank == "8":
+            return 8
+        if self.rank == "9":
+            return 9
+        if self.rank in ["10", "Jack", "Queen", "King"]:
+            return 10
+        return self.card_value
+
+    def __repr__(self):
+        return f"\033[1;32m{self.rank}\033[0m of \033[1;34m{self.suit}\033[0m with " \
+               f"\033[1;33;40mcard value\033[0m of: " f"\033[1;31m{self.value_of_card()}\033[0m"
+
+class Deck:
+    def __init__(self):
+        self.cards = [Card(suit, rank) for suit in suits for rank in ranks]
+        self.returned_cards = []
+        self.card_dealt_number = 1
+
+    def shuffle(self):
+        random.shuffle(self.cards)
+
+    def draw(self):
+        return self.cards.pop()
+
+    def deal_cards(self):
+        print("\n")
+        print("Here are the deck of cards:")
+        card_dealt_number = 1
+        returned_cards = []
+        for i in range(len(self.cards)):
+            card_drawn = self.draw()
+            self.returned_cards.append(card_drawn)
+            print(f"Card dealt number: {card_dealt_number} - {card_drawn}")
+            card_dealt_number += 1
+        # Put cards back into deck
+        self.cards = self.returned_cards
+        self.cards.reverse()
+    def __repr__(self):
+        return f"Deck of {len(self.cards)} cards"
 
 # ----- ----- ----- ----- ----- ----- ----- ----- Variables / Booleans ----- ----- ----- ----- ----- ----- ----- ----- #
 # Player total (Blackjack count)
@@ -117,16 +180,30 @@ def player_turn(hand_of_player):
         print(f"{players[-1]}'s hand is: [Hidden, " + f"{hand_of_player[-1]}] with \033[1;33;40mtotal value\033[0m of: "
               f"\033[1;31;40m{add_player_total(hand_of_player) - hand_of_player[0].value_of_card()}\033[0m")
 
+# Method to reply if you have the same rank in a hand
+def response(resp_1, resp_2 = None, resp_3 = None, resp_4 = None):
+    rank_response = ""
+    while rank_response.lower() not in [resp_1, resp_2]:
+        rank_response = input(f"You have a hand with the same rank! Would you like to split them? ({resp_1}/{resp_2}): ")
+        if rank_response.lower() == {resp_1}:
+            print("You chose to split your hand.")
+            break
+        elif rank_response.lower() == {resp_2}:
+            print("You chose not to split your hand.")
+        while rank_response.lower() not in [resp_1, resp_2]:
+            rank_response = input(f"Invalid choice. Please enter ({resp_1}/{resp_2}) to split your hand: ")
+            if rank_response.lower() == resp_1:
+                print("You chose to split your hand.")
+                break
+            elif rank_response.lower() == resp_2:
+                print("You chose not to split your hand.")
+                break
+
 # Hit, Stay, Split, Double Down
 def continuation(hand_of_player):
     if hand_of_player == player_hand:
-        if check_same_rank(hand_of_player, "Ace"):
-            two_aces_response = input("You have two Aces! Would you like to split them? (y/n): ")
-            if two_aces_response.lower in ["y", "n"]:
-                if two_aces_response.lower == "y":
-                    print("You chose to split. Your Aces.")
-                elif two_aces_response.lower == "n":
-                    print("You did not chose to split.")
+        if check_same_rank(hand_of_player):
+            response("y", "n")
 
 # Blackjack on deal method
 def blackjack_on_deal(hand_of_player):
@@ -143,15 +220,18 @@ def blackjack_on_deal(hand_of_player):
             print(f"{players[-1]}'s hand is: {hand_of_player} with \033[1;33;40mtotal value\033[0m of: "
                   f"\033[1;31;40m{add_player_total(hand_of_player)}\033[0m")
 
-# Initial deal method
-def init_deal(deck, hand_of_player, hand_of_dealer):
+# Deal hands method
+def deal_hand(deck, player_1, dealer):
     for turn in range(4):
         card_drawn = deck.draw()
         if (turn % 2) == 0:
-            hand_of_player.append(card_drawn)
+            player_1.append(card_drawn)
         elif (turn % 2) == 1:
-            hand_of_dealer.append(card_drawn)
-    # Both players have Blackjack
+            dealer.append(card_drawn)
+
+# Initial deal method
+def init_deal(deck, hand_of_player, hand_of_dealer):
+    deal_hand(deck, player_hand, dealer_hand)
     if check_for_blackjack(player_hand) == True and check_for_blackjack(dealer_hand) == True:
         print("\n")
         blackjack_on_deal(player_hand)
