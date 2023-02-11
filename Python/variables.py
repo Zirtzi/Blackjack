@@ -213,47 +213,98 @@ def deal_hand(deck, player, dealer):
     parameter_check(player_hand)
     parameter_check(dealer_hand)
 
-def hit(deck, hand):
+# Hit method
+def player_hit(deck, hand):
+    hand_total = sum([card.value_of_card() for card in hand])
     card_drawn = deck.draw()
+    if hand_total >= 11 and card_drawn.rank == "Ace":
+        card_drawn.card_value = 1
     hand.append(card_drawn)
 
-def stay(deck):
-    return None
+def dealer_hit(deck, dealer_hand_total, player_hand_total):
+    while dealer_hand_total < 17:
+        card_drawn = deck.draw()
+        dealer_hand.append(card_drawn)
+        dealer_hand_total = add_player_total(dealer_hand)
+        print(f"Dealer hits, current hand: {dealer_hand} with \033[1;33;40mtotal value\033[0m"
+              f" of: \033[1;31;40m{dealer_hand_total}\033[0m.")
+    if dealer_hand_total >= 17 and dealer_hand_total <= 21:
+        if dealer_hand_total == player_hand_total:
+            print("\n")
+            print("Each player has the same final value. Final hands are: ")
+            display_hand(player_hand)
+            display_hand(dealer_hand, 1)
+        elif dealer_hand_total > player_hand_total:
+            print("\n")
+            print("The dealer has a greater final value, the dealer wins. Final hands are: ")
+            display_hand(player_hand)
+            display_hand(dealer_hand, 1)
+        elif dealer_hand_total < player_hand_total:
+            print("\n")
+            print("The player has a greater final value, player wins. Final hands are: ")
+            display_hand(player_hand)
+            display_hand(dealer_hand, 1)
+    elif dealer_hand_total > 21:
+        print("\n")
+        print("The dealer has broken, player wins. Final hands are: ")
+        display_hand(player_hand)
+        display_hand(dealer_hand, 1)
 
 # Hit, Stay, Double Down Prompt method
 def play_game(deck, hand):
     if hand == player_hand:
         response = ""
+        has_hit = False
         player_hand_total = add_player_total(hand)
+        dealer_hand_total = add_player_total(dealer_hand)
         while response not in ["h", "s", "d"] and player_hand_total < 21:
-            print("\n")
-            response = input("Would you like to hit, stay, or double down? (h/s/d): ")
-            print("\n")
+            if not has_hit:
+                print("\n")
+                response = input("Would you like to hit, stay, or double down? (h/s/d): ")
+                print("\n")
+            elif has_hit:
+                print("\n")
+                response = input("Would you like to hit or stay? (h/s): ")
+                while response.lower() not in ["h", "s"]:
+                    response = input("Invalid response. Would you like to hit or stay? (h/s): ")
+                print("\n")
             if response.lower() == "h":
-                hit(deck, hand)
+                has_hit = True
+                player_hit(deck, hand)
                 player_hand_total = add_player_total(hand)
-                if player_hand_total < 21:
-                    print("You chose to hit, current hands are: ")
-                    display_hand(hand)
-                    display_hand(dealer_hand)
-                elif player_hand_total == 21:
-                    print("You have 21! The current hands are: ")
-                    display_hand(hand)
-                    display_hand(dealer_hand)
-                elif player_hand_total > 21:
-                    print("You have busted. The dealer wins. The final hands are: ")
+                dealer_hand_total = add_player_total(dealer_hand)
+                if player_hand_total > 21:
+                    print("Player has busted, the dealer wins. Final hands are: ")
                     display_hand(hand)
                     display_hand(dealer_hand, 1)
+                    break
+                elif player_hand_total <= 21:
+                    print(f"Player hits, current hand: {player_hand} with \033[1;33;40mtotal value\033[0m"
+                          f" of: \033[1;31;40m{player_hand_total}\033[0m.")
+                    if player_hand_total == 21:
+                        print("\n")
+                        display_hand(dealer_hand, 1)
+                        dealer_hit(deck, dealer_hand_total, player_hand_total)
+                    elif player_hand_total != 21:
+                        display_hand(dealer_hand)
                 response = ""
             elif response.lower() == "s":
-                display_hand(hand)
-                display_hand(dealer_hand, "display")
-            elif response.lower() == "d":
-                card_drawn = deck.draw()
-                hand.append(card_drawn)
-                display_hand(hand)
-                display_hand(dealer_hand, "display")
                 player_hand_total = add_player_total(hand)
+                dealer_hand_total = add_player_total(dealer_hand)
+                print(f"Player has chosen to stay with a final value of {player_hand_total}. \n")
+                dealer_hit(deck, dealer_hand_total, player_hand_total)
+            elif response.lower() == "d" and not has_hit:
+                player_hit(deck, hand)
+                player_hand_total = add_player_total(hand)
+                dealer_hand_total = add_player_total(dealer_hand)
+                if player_hand_total > 21:
+                    print(f"Player has busted, dealer wins. Final hands are: ")
+                    display_hand(hand)
+                    display_hand(dealer_hand, 1)
+                elif player_hand_total <= 21:
+                    print(f"Player has doubled down with a final value of {player_hand_total}. \n")
+                    display_hand(hand)
+                    dealer_hit(deck, dealer_hand_total, player_hand_total)
             else:
                 print("Invalid answer, please re-enter your choice:")
                 continue
