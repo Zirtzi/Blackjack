@@ -1,4 +1,6 @@
+# ----- ----- ----- ----- ----- ----- ----- ----- ----- Imports ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 import random
+
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Arrays ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 # Creating suits and ranks for cards
 suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
@@ -11,43 +13,30 @@ players = ["Player 1", "Dealer"]
 player_hand = []
 dealer_hand = []
 
+# ----- ----- ----- ----- ----- ----- ----- ----- Variables / Booleans ----- ----- ----- ----- ----- ----- ----- ----- #
+# Player total (Blackjack count)
+player_total = 0
+dealer_total = 0
+
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Classes ----- ----- ----- ----- ----- ----- ----- ----- ----- #
+# Card Class
 class Card:
-    def __init__(self, suit, rank, card_value = None):
+    def __init__(self, rank, suit):
         self.suit = suit
         self.rank = rank
-        self.card_value = card_value
+        self.card_value = 11 if rank == "Ace" else 10 if rank in ["10", "Jack", "Queen", "King"] else int(rank)
 
     def value_of_card(self):
-        if self.rank == "Ace":
-            return 11
-        if self.rank == "2":
-            return 2
-        if self.rank == "3":
-            return 3
-        if self.rank == "4":
-            return 4
-        if self.rank == "5":
-            return 5
-        if self.rank == "6":
-            return 6
-        if self.rank == "7":
-            return 7
-        if self.rank == "8":
-            return 8
-        if self.rank == "9":
-            return 9
-        if self.rank in ["10", "Jack", "Queen", "King"]:
-            return 10
         return self.card_value
 
     def __repr__(self):
         return f"\033[1;32m{self.rank}\033[0m of \033[1;34m{self.suit}\033[0m with " \
                f"\033[1;33;40mcard value\033[0m of: " f"\033[1;31m{self.value_of_card()}\033[0m"
 
+# Deck class
 class Deck:
     def __init__(self):
-        self.cards = [Card(suit, rank) for suit in suits for rank in ranks]
+        self.cards = [Card(rank, suit) for rank in ranks for suit in suits]
         self.returned_cards = []
         self.card_dealt_number = 1
 
@@ -73,11 +62,6 @@ class Deck:
 
     def __repr__(self):
         return f"Deck of {len(self.cards)} cards"
-
-# ----- ----- ----- ----- ----- ----- ----- ----- Variables / Booleans ----- ----- ----- ----- ----- ----- ----- ----- #
-# Player total (Blackjack count)
-player_total = 0
-dealer_total = 0
 
 # ----- ----- ----- ----- ----- ----- ----- ----- Methods ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 # Adding values of players
@@ -132,7 +116,6 @@ def check_same_rank(hand, checking_rank = None):
             result = True
     return result
 
-
 # Check for same suit method
 def check_same_suit(hand, checking_suit = None):
     result = False
@@ -186,224 +169,98 @@ def parameter_check(hand):
               f" \033[1;32;40mRank\033[0m = \033[1;31;40m{check_same_rank(hand)}\033[0m, "
               f" \033[1;32;40mBlackjack\033[0m = \033[1;31;40m{check_for_blackjack(hand)}\033[0m]")
 
-# Player turn method
-def display_hand(hand_of_player, display = None):
-    if hand_of_player != dealer_hand:
-        print(f"{players[0]}'s hand is: {hand_of_player} with \033[1;33;40mtotal "
-              f"value\033[0m of: \033[1;31;40m{add_player_total(hand_of_player)}\033[0m")
-    elif hand_of_player == dealer_hand and display is None:
-        print(f"{players[-1]}'s hand is: [Hidden, " + f"{hand_of_player[-1]}] with \033[1;33;40mtotal value\033[0m of: "
-              f"\033[1;31;40m{add_player_total(hand_of_player) - hand_of_player[0].value_of_card()}\033[0m")
-    elif hand_of_player == dealer_hand and display is not None:
-        print(f"{players[1]}'s hand is: {hand_of_player} with \033[1;33;40mtotal "
-              f"value\033[0m of: \033[1;31;40m{add_player_total(hand_of_player)}\033[0m")
+# Display hand method
+def display_hand(hand, display = None):
+    if hand != dealer_hand:
+        print(f"{players[0]}'s hand is: {hand} with \033[1;33;40mtotal "
+              f"value\033[0m of: \033[1;31;40m{add_player_total(hand)}\033[0m")
+    elif hand == dealer_hand and display is None:
+        print(f"{players[-1]}'s hand is: [Hidden, " + f"{hand[-1]}] with \033[1;33;40mtotal value\033[0m of: "
+              f"\033[1;31;40m{add_player_total(hand) - hand[0].value_of_card()}\033[0m")
+    elif hand == dealer_hand and display is not None:
+        print(f"{players[1]}'s hand is: {hand} with \033[1;33;40mtotal "
+              f"value\033[0m of: \033[1;31;40m{add_player_total(hand)}\033[0m")
 
-# Deal hands method
-def deal_hand(deck):
-    for turn in range(4):
-        card_drawn = deck.draw()
-        if (turn % 2) == 0:
-            player_hand.append(card_drawn)
-        elif (turn % 2) == 1:
-            dealer_hand.append(card_drawn)
-    print("\n")
-    display_hand(player_hand)
-    display_hand(dealer_hand)
-    print("\n")
-    parameter_check(player_hand)
-    parameter_check(dealer_hand)
+# Dealer showing Ace
+def dealer_showing_ace():
+    result = False
+    if dealer_hand[1].rank == "Ace":
+        result = True
+    else:
+        result = False
+    return result
 
-# Hit method
-def player_hit(deck, hand):
-    hand_total = sum([card.value_of_card() for card in hand])
-    card_drawn = deck.draw()
-    hand.append(card_drawn)
-
-# Dealer hit method
-def dealer_hit(deck, hand, dealer_hand_total, player_hand_total):
-    print("The dealer will now play their hand.")
-    while dealer_hand_total < 17:
-        card_drawn = deck.draw()
-        dealer_hand.append(card_drawn)
-        dealer_hand_total = add_player_total(dealer_hand)
-        print(f"Dealer hits, current hand: {dealer_hand} with \033[1;33;40mtotal value\033[0m"
-              f" of: \033[1;31;40m{dealer_hand_total}\033[0m.")
-    if dealer_hand_total >= 17 and dealer_hand_total <= 21:
-        if dealer_hand_total == player_hand_total:
-            print("\n")
-            print(f"Each player has the same final value of {player_hand_total}. Final hands are: ")
-            display_hand(hand)
-            display_hand(dealer_hand, 1)
-        elif dealer_hand_total > player_hand_total:
-            print("\n")
-            print(f"The dealer has a greater final value {dealer_hand_total}, the dealer wins. Final hands are: ")
-            display_hand(hand)
-            display_hand(dealer_hand, 1)
-        elif dealer_hand_total < player_hand_total:
-            print("\n")
-            print(f"The player has a greater final value of {player_hand_total}, player wins. Final hands are: ")
-            display_hand(hand)
-            display_hand(dealer_hand, 1)
-    elif dealer_hand_total > 21:
-        print("\n")
-        print(f"The dealer has broken with a value of {dealer_hand_total}, player wins. Final hands are: ")
-        display_hand(hand)
-        display_hand(dealer_hand, 1)
+# Re-Assing Ace's value method
+def reassign_ace_value(hand):
+    hand[0].card_value = 1
+    hand[1].card_value = 11
+    return hand
 
 # Split hand method
-def split_hand(deck, hand):
-    return None
+def split_hand(hand):
+    hand_1 = hand[0]
+    hand_2 = hand[1]
+    return hand_1, hand_2
 
-# player_has_same_rank = check_same_rank(player_hand)
-# print(player_has_same_rank)
-# if player_has_same_rank == True:
-#     player_same_rank_response = ""
-#     while player_same_rank_response.lower() not in ["y", "n"]:
-#         player_same_rank_response = input("You have the same rank in your cards. "
-#                                           "Would you like to split your hand? (y/n): ")
-#         if player_same_rank_response.lower() == "y":
-#             first_hand_draw = deck.draw()
-#             first_hand = [player_hand[0], first_hand_draw]
-#             second_hand = [player_hand[-1]]
-#             all_hands = [first_hand, second_hand]
-#             for hand in all_hands:
-#                 display_hand(hand)
-#         elif player_same_rank_response.lower() == "n":
-#             print("You have chosen to not split your hands. ")
-#             hit_stay_double_down(deck, player_hand)
-#         elif player_same_rank_response.lower() not in ["y", "n"]:
-#             print("\n")
-#             print("Invalid response.")
-#             continue
-# elif player_has_same_rank == False:
-#     hit_stay_double_down(deck, player_hand)
+# Select hand method
+def select_hand(hand, choice):
+    hands = split_hand(hand)
+    return [hands[choice]]
 
-
-# Hit, stay, double down method
-def hit_stay_double_down(deck, hand):
-    player_hand_total = add_player_total(hand)
-    dealer_hand_total = add_player_total(dealer_hand)
-    has_hit = False
-    response = ""
-    while response not in ["h", "s", "d"] and player_hand_total < 21:
-        if not has_hit:
+# Conditions check method
+def conditions_check():
+    if dealer_showing_ace():
+        choice = ""
+        while choice.lower() not in ["y", "n"]:
+            choice = input("The dealer is showing an Ace, would you like to buy insurance? (y/n): ")
             print("\n")
-            response = input("Would you like to hit, stay, or double down? (h/s/d): ")
-            print("\n")
-        elif has_hit:
-            print("\n")
-            response = input("Would you like to hit or stay? (h/s): ")
-            while response.lower() not in ["h", "s"]:
-                response = input("Invalid response. Would you like to hit or stay? (h/s): ")
-            print("\n")
-        if response.lower() == "h":
-            has_hit = True
-            player_hit(deck, hand)
-            player_hand_total = add_player_total(hand)
-            dealer_hand_total = add_player_total(dealer_hand)
-            if player_hand_total > 21:
-                print("Player has busted, the dealer wins. Final hands are: ")
-                display_hand(hand)
-                display_hand(dealer_hand, 1)
-                break
-            elif player_hand_total < 21:
-                print(f"Player hits, current: {hand} with \033[1;33;40mtotal value\033[0m"
-                      f" of: \033[1;31;40m{player_hand_total}\033[0m.")
-                display_hand(dealer_hand)
-            elif player_hand_total == 21:
-                display_hand(hand)
-                display_hand(dealer_hand, 1)
+            if choice.lower() == "y":
+                print("Player has chosen to buy insurance, we will now check for if the dealer has Blackjack: ")
                 print("\n")
-                dealer_hit(deck, hand, dealer_hand_total, player_hand_total)
-            response = ""
-        elif response.lower() == "s":
-            player_hand_total = add_player_total(hand)
-            dealer_hand_total = add_player_total(dealer_hand)
-            print(f"Player has chosen to stay with a final value of {player_hand_total}. Here are the final hands: ")
-            display_hand(hand)
-            display_hand(dealer_hand, 1)
-            print("\n")
-            dealer_hit(deck, hand, dealer_hand_total, player_hand_total)
-        elif response.lower() == "d" and not has_hit:
-            player_hit(deck, hand)
-            player_hand_total = add_player_total(hand)
-            dealer_hand_total = add_player_total(dealer_hand)
-            if player_hand_total > 21:
-                print(f"Player has busted with a final value of {player_hand_total}, dealer wins. Final hands are: ")
-                display_hand(hand)
-                display_hand(dealer_hand, 1)
-            elif player_hand_total <= 21:
-                print(f"Player has doubled down with a final value of {player_hand_total}. \n")
-                display_hand(hand)
-                display_hand(dealer_hand, 1)
-                print("\n")
-                dealer_hit(deck, hand, dealer_hand_total, player_hand_total)
-        else:
-            print("Invalid answer, please re-enter your choice:")
-            continue
-
-# Dealer showing ace method
-def dealer_showing_ace(deck):
-    dealer_showing_ace = False
-    if dealer_hand[-1].rank == "Ace":
-        dealer_showing_ace = True
-    if dealer_showing_ace == True:
-        dealer_ace_response = ""
-        while dealer_ace_response.lower() not in ["y", "n"]:
-            print("\n")
-            dealer_ace_response = input("The dealer is showing an Ace, would you like to buy insurance? (y/n): ")
-            if dealer_ace_response.lower() == "y":
-                print("\n")
-                print("You have chosen to buy insurance. We will now check if the dealer has blackjack.")
-                print("\n")
-                if check_for_blackjack(dealer_hand) == True and check_for_blackjack(player_hand) == True:
-                    print("Both players have blackjack, the player has won their insurance bet.")
-                    display_hand(player_hand)
-                    display_hand(dealer_hand, 1)
+                if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
+                    print("Both players have Blackjack, it is a push. Player wins insurance.")
+                    break
                 elif check_for_blackjack(dealer_hand) == True and check_for_blackjack(player_hand) == False:
-                    print("The dealer has blackjack, the player does not. Player wins insurance bet.")
-                    display_hand(player_hand)
-                    display_hand(dealer_hand, 1)
+                    print("Dealer has Blackjack, player wins insurance.")
+                    break
                 elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == True:
-                    print("The dealer does not have blackjack, player loses insurance. "
-                          "The player does have blackjack. Player wins!")
-                    display_hand(player_hand)
-                    display_hand(dealer_hand, 1)
+                    print("Dealer doesn't have Blackjack, player has Blackjack. Player loses insurance.")
+                    break
                 elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == False:
-                    print("Neither player has blackjack. The hand will continue.")
+                    print("Neither player has Blackjack, player loses insurance.")
                     print("\n")
-                    display_hand(player_hand)
-                    display_hand(dealer_hand)
-                    hit_stay_double_down(deck, player_hand)
-            elif dealer_ace_response.lower() == "n":
+                    if check_same_rank(dealer_hand, "Ace"):
+                        reassign_ace_value(dealer_hand)
+                    else:
+                        continue
+            elif choice.lower() == "n":
+                print("Player has chosen to not buy insurance. We will now check if the dealer has Blackjack: ")
                 print("\n")
-                print("You have chosen to not buy insurance. We will now check if the dealer has blackjack.")
-                print("\n")
-                if check_for_blackjack(dealer_hand) == True and check_for_blackjack(player_hand) == True:
-                    print("Both players have blackjack.")
-                    display_hand(player_hand)
-                    display_hand(dealer_hand, 1)
+                if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
+                    print("Both players have Blackjack, it is a push.")
+                    break
                 elif check_for_blackjack(dealer_hand) == True and check_for_blackjack(player_hand) == False:
-                    print("The dealer has blackjack, the player does not. Dealer wins.")
-                    display_hand(player_hand)
-                    display_hand(dealer_hand, 1)
+                    print("Dealer has Blackjack. Dealer wins.")
+                    break
                 elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == True:
-                    print("The dealer does not have blackjack, the player does have blackjack. Player wins!")
-                    display_hand(player_hand)
-                    display_hand(dealer_hand, 1)
+                    print("Dealer doesn't have Blackjack, player has Blackjack. Player wins.")
+                    break
                 elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == False:
-                    print("Neither player has blackjack. The hand will continue.")
+                    print("Neither player has Blackjack.")
                     print("\n")
-                    display_hand(player_hand)
-                    display_hand(dealer_hand)
-                    hit_stay_double_down(deck, player_hand)
-            elif dealer_ace_response.lower() not in ["y", "n"]:
-                print("\n")
+                    if check_same_rank(dealer_hand, "Ace"):
+                        reassign_ace_value(dealer_hand)
+                    else:
+                        continue
+            elif choice.lower() not in ["y", "n"]:
                 print("Invalid choice.")
-                continue
-    elif dealer_showing_ace == False:
-        hit_stay_double_down(deck, player_hand)
-
-# Play game method
-def play_game(deck):
-    dealer_showing_ace(deck)
+                print("\n")
+    elif dealer_showing_ace() == False:
+        if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
+            print("Both players have Blackjack, it is a push.")
+        elif check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand) == False:
+            print("Dealer has Blackjack.")
+        elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand):
+            print("Player has Blackjack. Player wins.")
+        elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand):
+            print("Neither player has Blackjack.")

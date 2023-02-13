@@ -1,5 +1,5 @@
 import random
-from variables import *
+from variables_alpha_1 import *
 
 # Card class,
 # Contains the value of the card as well as a suit and rank when drawn

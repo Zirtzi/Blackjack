@@ -1,11 +1,12 @@
-from variables import *
+from variables_alpha_2 import *
 
 # Initialization of deck as well as shuffle
 for i in range(1):
     # Initialization of deck as well as shuffle
     deck = Deck()
     deck.shuffle()
-    deck.deal_cards()
+    # Show the deck before the hands are dealt
+    # deck.deal_cards()
 
     # Deal and show hands of player
     deal_hand(deck)
