@@ -215,7 +215,7 @@ def deal_hand(deck):
 
 # Hit method
 def player_hit(deck, hand):
-    hand_total = sum([card.value_of_card() for card in hand])
+    # hand_total = sum([card.value_of_card() for card in hand])
     card_drawn = deck.draw()
     hand.append(card_drawn)
 
@@ -250,38 +250,9 @@ def dealer_hit(deck, hand, dealer_hand_total, player_hand_total):
         display_hand(hand)
         display_hand(dealer_hand, 1)
 
-# Split hand method
-def split_hand(deck, hand):
-    return None
-
-# player_has_same_rank = check_same_rank(player_hand)
-# print(player_has_same_rank)
-# if player_has_same_rank == True:
-#     player_same_rank_response = ""
-#     while player_same_rank_response.lower() not in ["y", "n"]:
-#         player_same_rank_response = input("You have the same rank in your cards. "
-#                                           "Would you like to split your hand? (y/n): ")
-#         if player_same_rank_response.lower() == "y":
-#             first_hand_draw = deck.draw()
-#             first_hand = [player_hand[0], first_hand_draw]
-#             second_hand = [player_hand[-1]]
-#             all_hands = [first_hand, second_hand]
-#             for hand in all_hands:
-#                 display_hand(hand)
-#         elif player_same_rank_response.lower() == "n":
-#             print("You have chosen to not split your hands. ")
-#             hit_stay_double_down(deck, player_hand)
-#         elif player_same_rank_response.lower() not in ["y", "n"]:
-#             print("\n")
-#             print("Invalid response.")
-#             continue
-# elif player_has_same_rank == False:
-#     hit_stay_double_down(deck, player_hand)
-
 # Hit, stay, double down method
 def hit_stay_double_down(deck, hand):
     player_hand_total = add_player_total(hand)
-    dealer_hand_total = add_player_total(dealer_hand)
     has_hit = False
     response = ""
     while response not in ["h", "s", "d"] and player_hand_total < 21:
