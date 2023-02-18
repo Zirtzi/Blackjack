@@ -37,20 +37,40 @@ class Card:
 class Deck:
     def __init__(self):
         self.cards = [Card(rank, suit) for rank in ranks for suit in suits]
+        self.rigged_order = [
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("10", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("2", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("2", "Diamonds"),
+            Card("Ace", "Diamonds"),
+        ]
         self.returned_cards = []
-        self.card_dealt_number = 1
 
     def shuffle(self):
         random.shuffle(self.cards)
 
     def draw(self):
-        return self.cards.pop()
+        return self.rigged_order.pop()
+        # return self.cards.pop()
 
     def deal_cards(self):
         print("\n")
         print("Here are the deck of cards:")
         card_dealt_number = 1
-        returned_cards = []
+        self.returned_cards = []
         for i in range(len(self.cards)):
             card_drawn = self.draw()
             self.returned_cards.append(card_drawn)
@@ -105,11 +125,11 @@ def check_for_total(hand, checking_total):
 def check_same_rank(hand, checking_rank = None):
     result = False
     card_1 = hand[0]
-    card_2 = hand[-1]
+    card_2 = hand[1]
     if checking_rank is None:
         if card_1.rank == card_2.rank:
             result = True
-    else:
+    elif checking_rank is not None:
         if card_1.rank == card_2.rank == checking_rank:
             result = True
     return result
@@ -191,7 +211,7 @@ def deal_hand(deck):
                         reassign_ace_value(dealer_hand)
                     else:
                         continue
-                    hit_stay_double_down(deck, player_same_rank_check(deck))
+                    # hit_stay_double_down(deck, player_same_rank_check(deck))
             elif choice.lower() == "n":
                 print("Player has chosen to not buy insurance. We will now check if the dealer has Blackjack: " "\n")
                 if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
@@ -209,7 +229,7 @@ def deal_hand(deck):
                         reassign_ace_value(dealer_hand)
                     else:
                         continue
-                    hit_stay_double_down(deck, player_same_rank_check(deck))
+                    # hit_stay_double_down(deck, player_same_rank_check(deck))
             else:
                 print("\033[1;31;40mInvalid choice\033[0m." "\n")
     elif dealer_showing_ace() == False:
@@ -220,7 +240,7 @@ def deal_hand(deck):
         elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand):
             print("Player has Blackjack. Player wins.")
         elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == False:
-            hit_stay_double_down(deck, player_same_rank_check(deck))
+            hit_stay_double_down(deck, player_same_rank_check(deck)[0])
     print("\n" "This hand has ended. On to the next!" "\n")
 
 # Dealer play method
@@ -304,15 +324,13 @@ def display_hand(hand, display = None):
                     place_holder = "First"
                 elif counter == 2:
                     place_holder = "Second"
-                elif counter == 3:
-                    place_holder = "Third"
-                elif counter ==4:
-                    place_holder = "Fourth"
                 print(f"{players[0]}'s \033[1;33;40m{place_holder}\033[0m hand is: "
                       f"{current_hand} with \033[1;33;40mtotal value\033[0m of: "
                       f"\033[1;31;40m{add_player_total(current_hand)}\033[0m")
                 counter += 1
         else:
+            if check_same_rank(hand, "Ace"):
+                reassign_ace_value(hand)
             print(f"{players[0]}'s hand is: {hand} with \033[1;33;40mtotal "
                   f"value\033[0m of: \033[1;31;40m{add_player_total(hand)}\033[0m")
     elif hand == dealer_hand and display is None:
@@ -326,22 +344,17 @@ def display_hand(hand, display = None):
 def hit(deck, hand):
     card_drawn = deck.draw()
     hand.append(card_drawn)
+    return [hand]
 
 # Hit, Stay, Double Down method
 def hit_stay_double_down(deck, hands):
     hand_counter = 1
     for current_hand in hands:
         if hand_counter == 1:
-            place_holder = "first"
+            place_holder = "First"
         elif hand_counter == 2:
-            place_holder = "second"
-            current_hand.append(deck.draw())
-        elif hand_counter == 3:
-            place_holder = "third"
-            current_hand.append(deck.draw())
-        elif hand_counter == 4:
-            place_holder = "fourth"
-            current_hand.append(deck.draw())
+            place_holder = "Second"
+            hit(deck, current_hand)
         player_hand_total = add_player_total(current_hand)
         has_hit = False
         response = ""
@@ -350,7 +363,7 @@ def hit_stay_double_down(deck, hands):
                 if hand_counter > 1:
                     print("\n" f"We are now on hand \033[1;32;40m{hand_counter}\033[0m." "\n" f"{players[0]}'s "
                           f"\033[1;33;40m{place_holder}\033[0m hand is: {current_hand} with "
-                          f"\033[1;33;40mtotal value\033[0m of: \033[1;31;40m{add_player_total(current_hand)}\033[0m" 
+                          f"\033[1;33;40mtotal value\033[0m of: \033[1;31;40m{add_player_total(current_hand)}\033[0m"
                           f"\n")
                 response = input(f"Would you like to \033[1;31;40mhit, stay, or double down\033[0m on the"
                                  f" \033[1;33;40m{place_holder}\033[0m hand? \033[1;34;40m(h/s/d):\033[0m ")
@@ -371,17 +384,19 @@ def hit_stay_double_down(deck, hands):
                     display_hand(current_hand)
                     break
                 elif player_hand_total < 21:
-                    print(f"Player \033[1;33;40mhits\033[0m on hand \033[1;32;40m{hand_counter}\033[0m: {current_hand}"
-                          f" with \033[1;33;40mtotal value\033[0m of: \033[1;31;40m{player_hand_total}\033[0m.")
+                    print(
+                        f"Player \033[1;33;40mhits\033[0m on hand \033[1;32;40m{hand_counter}\033[0m: {current_hand}"
+                        f" with \033[1;33;40mtotal value\033[0m of: \033[1;31;40m{player_hand_total}\033[0m.")
                 elif player_hand_total == 21:
                     print(f"Player has \033[1;31;40m{player_hand_total}\033[0m. No more cards will be accepted.")
                     display_hand(current_hand)
                 response = ""
             elif response.lower() == "s":
                 player_hand_total = add_player_total(current_hand)
-                print(f"Player has \033[1;33;40mchosen to stay\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with "
-                      f"a \033[1;31;40mfinal value\033[0m of"
-                      f" \033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
+                print(
+                    f"Player has \033[1;33;40mchosen to stay\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with "
+                    f"a \033[1;31;40mfinal value\033[0m of"
+                    f" \033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
                 display_hand(current_hand)
             elif response.lower() == "d" and not has_hit:
                 hit(deck, current_hand)
@@ -392,9 +407,10 @@ def hit_stay_double_down(deck, hands):
                           f"\033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
                     display_hand(current_hand)
                 elif player_hand_total <= 21:
-                    print(f"Player has \033[1;31;40mdoubled down\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with"
-                          f" a \033[1;31;40mfinal value\033[0m of"
-                          f" \033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
+                    print(
+                        f"Player has \033[1;31;40mdoubled down\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with"
+                        f" a \033[1;31;40mfinal value\033[0m of"
+                        f" \033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
                     display_hand(current_hand)
             else:
                 print("\033[1;31;40mInvalid choice\033[0m." "\n")
@@ -425,63 +441,85 @@ def parameter_check(hand):
 
 # Player same rank method
 def player_same_rank_check(deck):
-    if check_same_rank(player_hand):
-        if check_same_rank(player_hand, "Ace"):
-            aces_response = ""
-            while aces_response not in ["y", "n"]:
-                aces_response = input("You have two \033[1;32;40mAces\033[0m in your hand,"
-                                      " would you like to \033[1;31;40msplit\033[0m your hand? "
-                                      "You may only split \033[1;31;40monce\033[0m. \033[1;34;40m(y/n)\033[0m: ")
-                if aces_response.lower() == "y":
-                    print("\n" "You have \033[1;31;40mchosen to split\033[0m your \033[1;32;40mAces\033[0m." "\n")
-                    hand_1 = split_hand(player_hand)[0][0]
-                    hand_2 = split_hand(player_hand)[0][1]
-                    hand_1.append(deck.draw())
-                    hand_2.append(deck.draw())
-                    display_hand([hand_1, hand_2])
-                    print("\n")
-                    return [hand_1, hand_2]
-                    break
-                elif aces_response.lower() == "n":
-                    print("\n" "You have \033[1;31;40mchosen to not split\033[0m your \033[1;32;40mAces\033[0m." "\n")
-                    new_player_hand = reassign_ace_value(player_hand)
-                    return [new_player_hand]
-                    break
-                else:
-                    print("\n" "\033[1;31;40mInvalid choice\033[0m." "\n")
-                    continue
-        else:
-            same_rank_response = ""
-            while same_rank_response not in ["y", "n"]:
-                same_rank_response = input(f"You have the \033[1;33;40msame rank\033[0m of "
-                                           f"\033[1;32;40m{player_hand[0].rank}\033[0m in your hand,"
-                                           f" would you like to \033[1;31;40msplit\033[0m your hand?"
-                                           f" \033[1;34;40m(y/n):\033[0m ")
-                if same_rank_response.lower() == "y":
-                    print("\n" f"You have \033[1;31;40mchosen to split\033[0m your"
-                          f" \033[1;32;40m{player_hand[0].rank}\033[0m's." "\n")
-                    hand_1 = split_hand(player_hand)[0][0]
-                    hand_2 = split_hand(player_hand)[0][1]
-                    hand_1.append(deck.draw())
-                    display_hand([hand_1, hand_2])
-                    print("\n")
-                    return [hand_1, hand_2]
-                    break
-                elif same_rank_response.lower() == "n":
-                    print("\n" f"You have \033[1;31;40mchosen to not split\033[0m your"
-                          f" \033[1;32;40m{player_hand[0].rank}\033[0m's." "\n")
-                    return [player_hand]
-                    break
-                else:
-                    print("\n" "\033[1;31;40mInvalid choice\033[0m." "\n")
-                    continue
+    global player_split_aces
+    global player_split_hand
+    player_split_aces = False
+    player_split_hand = False
+    if check_same_rank(player_hand, "Ace"):
+        aces_response = ""
+        while (aces_response not in ["y", "n"]) and player_split_aces == False:
+            aces_response = input("You have two \033[1;32;40mAces\033[0m in your hand,"
+                                  " would you like to \033[1;31;40msplit\033[0m your hand? "
+                                  "You may only split \033[1;31;40monce\033[0m. \033[1;34;40m(y/n)\033[0m: ")
+            if aces_response.lower() == "y":
+                print("\n" "You have \033[1;31;40mchosen to split\033[0m your \033[1;32;40mAces\033[0m." "\n")
+                hand_1 = split_hand(player_hand)[0][0]
+                hand_2 = split_hand(player_hand)[0][1]
+                hit(deck, hand_1)
+                hit(deck, hand_2)
+                if check_same_rank(hand_1, "Ace"):
+                    reassign_ace_value(hand_1)
+                if check_same_rank(hand_2, "Ace"):
+                    reassign_ace_value(hand_2)
+                display_hand([hand_1, hand_2])
+                player_split_aces = True
+                print("\n")
+                return [[hand_1, hand_2], player_split_aces]
+                break
+            elif aces_response.lower() == "n":
+                print("\n" "You have \033[1;31;40mchosen to not split\033[0m your \033[1;32;40mAces\033[0m." "\n")
+                new_player_hand = reassign_ace_value(player_hand)
+                display_hand(new_player_hand)
+                print("\n")
+                return [[new_player_hand], player_split_aces]
+                break
+            else:
+                print("\n" "\033[1;31;40mInvalid choice\033[0m." "\n")
+                continue
+    elif check_same_rank(player_hand):
+        same_rank_response = ""
+        while same_rank_response not in ["y", "n"]:
+            same_rank_response = input(f"You have the \033[1;33;40msame rank\033[0m of "
+                                       f"\033[1;32;40m{player_hand[0].rank}\033[0m in your hand,"
+                                       f" would you like to \033[1;31;40msplit\033[0m your hand?"
+                                       f" \033[1;34;40m(y/n):\033[0m ")
+            if same_rank_response.lower() == "y":
+                print("\n" f"You have \033[1;31;40mchosen to split\033[0m your"
+                      f" \033[1;32;40m{player_hand[0].rank}\033[0m's." "\n")
+                hand_1 = split_hand(player_hand)[0][0]
+                hand_2 = split_hand(player_hand)[0][1]
+                hit(deck, hand_1)
+                display_hand([hand_1, hand_2])
+                player_split_hand = True
+                print("\n")
+                return [[hand_1, hand_2], player_split_hand]
+                break
+            elif same_rank_response.lower() == "n":
+                print("\n" f"You have \033[1;31;40mchosen to not split\033[0m your"
+                      f" \033[1;32;40m{player_hand[0].rank}\033[0m's." "\n")
+                display_hand(player_hand)
+                print("\n")
+                print(player_split_hand)
+                return [[player_hand], player_split_hand]
+                break
+            else:
+                print("\n" "\033[1;31;40mInvalid choice\033[0m." "\n")
+                continue
     else:
-        return [player_hand]
+        return [[player_hand], player_split_hand]
 
 # Re-Assing Ace's value method
 def reassign_ace_value(hand):
-    hand[0].card_value = 1
-    hand[1].card_value = 11
+    num_aces_with_value_11 = 0
+    for card in hand:
+        if card.rank == "Ace":
+            if num_aces_with_value_11 == 0:
+                card.card_value = 11
+                num_aces_with_value_11 += 1
+            else:
+                card.card_value = 1
+        else:
+            pass
     return hand
 
 # Split hand method
