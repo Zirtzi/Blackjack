@@ -11,15 +11,13 @@ global players
 players = ["Player 1", "Dealer"]
 
 # Player hands
-global player_hand
-global dealer_hand
 player_hand = []
 dealer_hand = []
 
 # ----- ----- ----- ----- ----- ----- ----- ----- Variables / Booleans ----- ----- ----- ----- ----- ----- ----- ----- #
 # Player total (Blackjack count)
-global player_total
-global dealer_total
+player_split_aces = None
+player_split_hand = None
 player_total = 0
 dealer_total = 0
 
@@ -49,7 +47,7 @@ class Deck:
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
+            Card("10", "Diamonds"),
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
@@ -136,12 +134,8 @@ def check_same_rank(hand, checking_rank = None):
     result = True
     first_card_rank = hand[0].rank
     for card in hand[1:]:
-        if checking_rank is None:
-            if card.rank != first_card_rank:
-                result = False
-        else:
-            if card.rank != checking_rank:
-                result = False
+        if card.rank != first_card_rank or (checking_rank is not None and card.rank != checking_rank):
+            result = False
     return result
 
 # Check for blackjack method
@@ -252,74 +246,77 @@ def hit(deck, hand):
 
 # Hit, Stay, Double Down method
 def hit_stay_double_down(deck, hands):
-    hand_counter = 1
-    for current_hand in hands:
-        if hand_counter == 1:
-            place_holder = "First"
-        elif hand_counter == 2:
-            place_holder = "Second"
-            hit(deck, current_hand)
-        player_hand_total = add_card_total(current_hand)
-        has_hit = False
-        response = ""
-        while response not in ["h", "s", "d"] and player_hand_total < 21:
-            if not has_hit:
-                if hand_counter > 1:
-                    print("\n" f"We are now on hand \033[1;32;40m{hand_counter}\033[0m." "\n" f"{players[0]}'s "
-                          f"\033[1;33;40m{place_holder}\033[0m hand is: {current_hand} with "
-                          f"\033[1;33;40mtotal value\033[0m of: \033[1;31;40m{add_card_total(current_hand)}\033[0m"
-                          f"\n")
-                response = input(f"Would you like to \033[1;31;40mhit, stay, or double down\033[0m on the"
-                                 f" \033[1;33;40m{place_holder}\033[0m hand? \033[1;34;40m(h/s/d):\033[0m ")
-                print("\n")
-            elif has_hit:
-                print("\n")
-                response = input(f"Would you like to \033[1;31;40mhit or stay\033[0m"
-                                 f" on the \033[1;33;40m{place_holder}\033[0m hand?? \033[1;34;40m(h/s):\033[0m ")
-                print("\n")
-            if response.lower() == "h":
-                has_hit = True
+    if player_split_aces != True:
+        hand_counter = 1
+        for current_hand in hands:
+            if hand_counter == 1:
+                place_holder = "First"
+            elif hand_counter == 2:
+                place_holder = "Second"
                 hit(deck, current_hand)
-                player_hand_total = add_card_total(current_hand)
-                if player_hand_total > 21:
-                    print(f"Player \033[1;33;40mhas busted\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with a"
-                          f" \033[1;31;40mfinal value\033[0m of"
-                          f" \033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
-                    show_hand(current_hand)
-                    break
-                elif player_hand_total < 21:
+            player_hand_total = add_card_total(current_hand)
+            has_hit = False
+            response = ""
+            while response not in ["h", "s", "d"] and player_hand_total < 21:
+                if not has_hit:
+                    if hand_counter > 1:
+                        print("\n" f"We are now on hand \033[1;32;40m{hand_counter}\033[0m." "\n" f"{players[0]}'s "
+                              f"\033[1;33;40m{place_holder}\033[0m hand is: {current_hand} with "
+                              f"\033[1;33;40mtotal value\033[0m of: \033[1;31;40m{add_card_total(current_hand)}\033[0m"
+                              f"\n")
+                    response = input(f"Would you like to \033[1;31;40mhit, stay, or double down\033[0m on the"
+                                     f" \033[1;33;40m{place_holder}\033[0m hand? \033[1;34;40m(h/s/d):\033[0m ")
+                    print("\n")
+                elif has_hit:
+                    print("\n")
+                    response = input(f"Would you like to \033[1;31;40mhit or stay\033[0m"
+                                     f" on the \033[1;33;40m{place_holder}\033[0m hand?? \033[1;34;40m(h/s):\033[0m ")
+                    print("\n")
+                if response.lower() == "h":
+                    has_hit = True
+                    hit(deck, current_hand)
+                    player_hand_total = add_card_total(current_hand)
+                    if player_hand_total > 21:
+                        print(f"Player \033[1;33;40mhas busted\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with a"
+                              f" \033[1;31;40mfinal value\033[0m of"
+                              f" \033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
+                        show_hand(current_hand)
+                        break
+                    elif player_hand_total < 21:
+                        print(
+                            f"Player \033[1;33;40mhits\033[0m on hand \033[1;32;40m{hand_counter}\033[0m: {current_hand}"
+                            f" with \033[1;33;40mtotal value\033[0m of: \033[1;31;40m{player_hand_total}\033[0m.")
+                    elif player_hand_total == 21:
+                        print(f"Player has \033[1;31;40m{player_hand_total}\033[0m. No more cards will be accepted.")
+                        show_hand(current_hand)
+                    response = ""
+                elif response.lower() == "s":
+                    player_hand_total = add_card_total(current_hand)
                     print(
-                        f"Player \033[1;33;40mhits\033[0m on hand \033[1;32;40m{hand_counter}\033[0m: {current_hand}"
-                        f" with \033[1;33;40mtotal value\033[0m of: \033[1;31;40m{player_hand_total}\033[0m.")
-                elif player_hand_total == 21:
-                    print(f"Player has \033[1;31;40m{player_hand_total}\033[0m. No more cards will be accepted.")
-                    show_hand(current_hand)
-                response = ""
-            elif response.lower() == "s":
-                player_hand_total = add_card_total(current_hand)
-                print(
-                    f"Player has \033[1;33;40mchosen to stay\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with "
-                    f"a \033[1;31;40mfinal value\033[0m of"
-                    f" \033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
-                show_hand(current_hand)
-            elif response.lower() == "d" and not has_hit:
-                hit(deck, current_hand)
-                player_hand_total = add_card_total(current_hand)
-                if player_hand_total > 21:
-                    print(f"Player has \033[1;31;40mdoubled down\033[0m on hand "
-                          f"\033[1;32;40m{hand_counter}\033[0m and busted with a \033[1;31;40mfinal value\033[0m of "
-                          f"\033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
-                    show_hand(current_hand)
-                elif player_hand_total <= 21:
-                    print(
-                        f"Player has \033[1;31;40mdoubled down\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with"
-                        f" a \033[1;31;40mfinal value\033[0m of"
+                        f"Player has \033[1;33;40mchosen to stay\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with "
+                        f"a \033[1;31;40mfinal value\033[0m of"
                         f" \033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
                     show_hand(current_hand)
-            else:
-                print("\033[1;31;40mInvalid choice\033[0m." "\n")
-                continue
-        hand_counter += 1
+                elif response.lower() == "d" and not has_hit:
+                    hit(deck, current_hand)
+                    player_hand_total = add_card_total(current_hand)
+                    if player_hand_total > 21:
+                        print(f"Player has \033[1;31;40mdoubled down\033[0m on hand "
+                              f"\033[1;32;40m{hand_counter}\033[0m and busted with a \033[1;31;40mfinal value\033[0m of "
+                              f"\033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
+                        show_hand(current_hand)
+                    elif player_hand_total <= 21:
+                        print(
+                            f"Player has \033[1;31;40mdoubled down\033[0m on hand \033[1;32;40m{hand_counter}\033[0m with"
+                            f" a \033[1;31;40mfinal value\033[0m of"
+                            f" \033[1;31;40m{player_hand_total}\033[0m. Here is the \033[1;31;40mfinal hand\033[0m: ")
+                        show_hand(current_hand)
+                else:
+                    print("\033[1;31;40mInvalid choice\033[0m." "\n")
+                    continue
+            hand_counter += 1
+    else:
+        pass
     print("\n" "Here are the \033[1;31;40mfinal hands\033[0m of the player: ")
     for current_hand in hands:
         show_hand(current_hand)
@@ -330,11 +327,9 @@ def hit_stay_double_down(deck, hands):
 def player_same_rank_check(deck):
     global player_split_aces
     global player_split_hand
-    player_split_aces = False
-    player_split_hand = False
     if check_same_rank(player_hand, "Ace"):
         aces_response = ""
-        while (aces_response not in ["y", "n"]) and player_split_aces == False:
+        while (aces_response not in ["y", "n"]):
             aces_response = input("\n" f"You have two {player_hand[0].rank}'s in your hand. Would you like to split"
                                   f" your hand? You may only split your hand once. (y/n): ")
             if aces_response.lower() == "y":
@@ -361,15 +356,13 @@ def player_same_rank_check(deck):
                             card.card_value = 11
                         else:
                             pass
-                show_hand([hand_1, hand_2])
                 player_split_aces = True
-                return ([hand_1, hand_2], player_split_aces)
+                new_hand = [hand_1, hand_2]
                 break
             elif aces_response.lower() == "n":
                 print("\n" f"You have chosen not to split your {player_hand[0].rank}'s." "\n")
-                show_hand(player_hand)
-                return ([player_hand], player_split_aces)
-                break
+                player_split_aces = False
+                new_hand = player_hand
             else:
                 print("\n" "\033[1;31;40mInvalid choice\033[0m." "\n")
                 continue
@@ -383,20 +376,20 @@ def player_same_rank_check(deck):
                 hand_1 = split_hand(player_hand)[0][0]
                 hand_2 = split_hand(player_hand)[0][1]
                 hit(deck, hand_1)
-                show_hand([hand_1, hand_2])
                 player_split_hand = True
-                return ([hand_1, hand_2], player_split_hand)
+                new_hand = [hand_1, hand_2]
                 break
             elif same_rank_response.lower() == "n":
                 print("\n" f"You have chosen not to split your {player_hand[0].rank}'s." "\n")
-                show_hand(player_hand)
-                return ([player_hand], player_split_hand)
+                player_split_hand = False
+                new_hand = player_hand
                 break
             else:
                 print("\n" "\033[1;31;40mInvalid choice\033[0m." "\n")
                 continue
     else:
-        return ([player_hand], player_split_hand)
+        new_hand = player_hand
+    return [new_hand, player_split_aces, player_split_hand]
 
 # Re-Assing Ace's value method
 def reassign_ace_value(hand):
