@@ -51,7 +51,6 @@ class Deck:
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
             Card("10", "Diamonds"),
-            Card("Ace", "Diamonds"),
             Card("2", "Diamonds"),
             Card("Ace", "Diamonds"),
             Card("2", "Diamonds"),
@@ -262,7 +261,7 @@ def dealer_play(deck, hands, dealer_hand_total):
         display_hand(dealer_hand, 1)
     elif all_over_21 == False:
         while dealer_hand_total < 17:
-            dealer_hand.append(deck.draw())
+            hit(deck, dealer_hand)
             dealer_hand_total = add_player_total(dealer_hand)
             print(f"Dealer hits, current hand: {dealer_hand} with \033[1;33;40mtotal value\033[0m"
                   f" of: \033[1;31;40m{dealer_hand_total}\033[0m.")
@@ -329,8 +328,6 @@ def display_hand(hand, display = None):
                       f"\033[1;31;40m{add_player_total(current_hand)}\033[0m")
                 counter += 1
         else:
-            if check_same_rank(hand, "Ace"):
-                reassign_ace_value(hand)
             print(f"{players[0]}'s hand is: {hand} with \033[1;33;40mtotal "
                   f"value\033[0m of: \033[1;31;40m{add_player_total(hand)}\033[0m")
     elif hand == dealer_hand and display is None:
@@ -344,6 +341,10 @@ def display_hand(hand, display = None):
 def hit(deck, hand):
     card_drawn = deck.draw()
     hand.append(card_drawn)
+    if add_player_total(hand) > 21:
+        for card in hand:
+            if card.rank == "Ace":
+                card.card_value = 1
     return [hand]
 
 # Hit, Stay, Double Down method
@@ -510,17 +511,24 @@ def player_same_rank_check(deck):
 
 # Re-Assing Ace's value method
 def reassign_ace_value(hand):
-    num_aces_with_value_11 = 0
     for card in hand:
-        if card.rank == "Ace":
-            if num_aces_with_value_11 == 0:
-                card.card_value = 11
-                num_aces_with_value_11 += 1
-            else:
-                card.card_value = 1
+        if card.rank == "Ace" and card.card_value == 11:
+            card.card_value = 1
+            break
         else:
             pass
-    return hand
+    return [hand]
+    # num_aces_with_value_11 = 0
+    # for card in hand:
+    #     if card.rank == "Ace":
+    #         if num_aces_with_value_11 == 0:
+    #             card.card_value = 11
+    #             num_aces_with_value_11 += 1
+    #         else:
+    #             card.card_value = 1
+    #     else:
+    #         pass
+    # return [hand]
 
 # Split hand method
 def split_hand(hand):
