@@ -61,13 +61,12 @@ class Deck:
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
+            Card("3", "Diamonds"),
+            Card("3", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("2", "Hearts"),
             Card("Ace", "Diamonds"),
             Card("2", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("10", "Hearts"),
-            Card("Ace", "Diamonds"),
-            Card("10", "Diamonds"),
         ]
         self.returned_cards = []
 
@@ -113,16 +112,19 @@ class Deck:
 
 # ----- ----- ----- ----- ----- ----- ----- ----- Methods ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 def add_card_total(hand):
-    if isinstance(hand[0], list):
+    if isinstance(hand, list) and all(isinstance(hands, list) for hands in hand):
         total = 0
         for sublist in hand:
             for card in sublist:
                 total += card.value_of_card()
-        return total
+        return int(total)
+    elif isinstance(hand, list):
+        total = 0
+        for card in hand:
+            total += card.value_of_card()
+        return int(total)
     else:
-        total = sum(card.value_of_card() for card in hand)
-        return total
-
+        raise ValueError("Hand is not a list.")
 
 # Check for rank method
 def check_for_rank(card, checking_rank):
@@ -162,16 +164,6 @@ def check_for_blackjack(hand):
             continue
     return result
 
-# Check for specific total
-def check_for_total(hand, checking_total):
-    global result
-    result = False
-    if add_card_total(hand) == checking_total:
-        result = True
-    else:
-        result = False
-    return result
-
 # Deal method
 def deal(deck):
     for turn in range(4):
@@ -185,67 +177,71 @@ def deal(deck):
         dealer_hand[1].card_value = 11
     return [player_hand, dealer_hand]
 
+# Dealer logic method
+def dealer_logic(deck, hand):
+    global dealer_total
+    global dealer_hand
+    dealer_total = add_card_total(dealer_hand)
+    player_total = add_card_total(hand)
+    while check_for_rank(dealer_hand[1], "Ace") and dealer_total < 17:
+        hit(deck, dealer_hand)
+        dealer_total = add_card_total(dealer_hand)
+        print(f"Dealer hits, current hand: {dealer_hand} with total value of: {dealer_total}.")
+    print("\n")
+    if player_total > 21:
+        print(f"Player has busted with a final value of {player_total}. Player loses. Here are the final hands:")
+        show_hand(hand)
+        show_hand(dealer_hand, 1)
+    elif player_total <= 21:
+        if dealer_total == player_total:
+            print(f"Both players have the same final value of {player_total}. It is a push. Here are the final"
+                  f" hands.")
+            show_hand(hand)
+            show_hand(dealer_hand, 1)
+        elif dealer_total > player_total and dealer_total <= 21:
+            print(f"Dealer has a greater final value of {dealer_total}. Player loses. Here are the final hands:")
+            show_hand(hand)
+            show_hand(dealer_hand, 1)
+        elif dealer_total < player_total:
+            print(f"Player has a greater final value of {player_total}. Player wins. Here are the final hands:")
+            show_hand(hand)
+            show_hand(dealer_hand, 1)
+        elif dealer_total > 21:
+            print(f"Dealer has busted with a final value of {dealer_total}. Player wins. Here are the final hands:")
+            show_hand(hand)
+            show_hand(dealer_hand, 1)
+        else:
+            pass
+
 # Dealer play method
-def dealer_play(deck, hands, dealer_hand_total):
+def dealer_play(deck ,hand):
     print("\n" "The dealer will now play their hand.")
     player_totals = []
-    all_over_21 = True
-    for current_hand in hands:
-        player_totals.append(add_card_total(current_hand))
+    all_over_21 = False
+    if isinstance(hand, list) and not any(isinstance(hands, list) for hands in hand):
+        player_totals.append(add_card_total(hand))
+    elif isinstance(hand, list) and all(isinstance(hands, list) for hands in hand):
+        for current_hand in hand:
+            player_totals.append(add_card_total(current_hand))
+    else:
+        raise ValueError("This is an incorrect data type.")
     for current_total in player_totals:
-        if current_total <= 21:
+        if current_total < 21:
             all_over_21 = False
             break
     if all_over_21:
-        print("\n" "The player \033[1;33;40mhas busted\033[0m on both hands therefore the dealer has won both hands. "
-              "Here are the \033[1;31;40mfinal hands\033[0m:")
-        for current_hand in hands:
+        print("\n" "The player has on both hands therefore the dealer has won both hands. Here are the final hands:")
+        for current_hand in hand:
             show_hand(current_hand)
-        show_hand(dealer_hand, 1)
+        show_hand(dealer_hand,1)
     elif all_over_21 == False:
-        while dealer_hand_total < 17:
-            hit(deck, dealer_hand)
-            dealer_hand_total = add_card_total(dealer_hand)
-            print(f"Dealer hits, current hand: {dealer_hand} with \033[1;33;40mtotal value\033[0m"
-                  f" of: \033[1;31;40m{dealer_hand_total}\033[0m.")
-        hand_counter = 1
-        for current_hand in hands:
-            player_hand_total = add_card_total(current_hand)
-            if player_hand_total > 21:
-                print("\n" f"The player \033[1;33;40mhas busted\033[0m with a \033[1;31;40mfinal value\033[0m of "
-                      f"\033[1;31;40m{player_hand_total}\033[0m. \033[1;31;40mPlayer has lost\033[0m hand "
-                      f"\033[1;32;40m{hand_counter}\033[0m. Here are the \033[1;31;40mfinal"
-                      f" hands\033[0m of the current hand:")
-                show_hand(current_hand)
-                show_hand(dealer_hand, 1)
-            elif player_hand_total <= 21:
-                if dealer_hand_total == player_hand_total:
-                    print("\n" f"Both players have a \033[1;31;40mfinal value\033[0m of "
-                          f"\033[1;31;40m{player_hand_total}\033[0m. Hand \033[1;32;40m{hand_counter}\033[0m"
-                          f" is a push. Here are the \033[1;31;40mfinal hands\033[0m of the current hand:")
-                    show_hand(current_hand)
-                    show_hand(dealer_hand, 1)
-                elif dealer_hand_total > player_hand_total and dealer_hand_total <= 21:
-                    print("\n" f"The dealer \033[1;33;40mhas a greater\033[0m \033[1;31;40mfinal value\033[0m of"
-                          f" \033[1;31;40m{dealer_hand_total}\033[0m. \033[1;31;40mPlayer has lost\033[0m hand"
-                          f" \033[1;32;40m{hand_counter}\033[0m. Here are the \033[1;31;40mfinal"
-                          f" hands\033[0m of the current hand:")
-                    show_hand(current_hand)
-                    show_hand(dealer_hand, 1)
-                elif dealer_hand_total < player_hand_total or dealer_hand_total > 21:
-                    if dealer_hand_total <= 21:
-                        print("\n" f"The player \033[1;33;40mhas a greater\033[0m \033[1;31;40mfinal value\033[0m of"
-                              f" \033[1;31;40m{player_hand_total}\033[0m. \033[1;31;40mPlayer has won\033[0m hand"
-                              f" \033[1;32;40m{hand_counter}\033[0m. Here are the \033[1;31;40mfinal"
-                              f" hands\033[0m of the current hand:")
-                    elif dealer_hand_total > 21:
-                        print("\n" f"The dealer \033[1;33;40mhas busted\033[0m with a"
-                              f" \033[1;31;40mfinal value\033[0m of {dealer_hand_total}."
-                              f" \033[1;31;40mPlayer has won\033[0m hand \033[1;32;40m{hand_counter}\033[0m."
-                              f" Here are the \033[1;31;40mfinal hands\033[0m of the current hand:")
-                    show_hand(current_hand)
-                    show_hand(dealer_hand, 1)
-            hand_counter += 1
+        if player_split_aces == True or player_split_hand == True:
+            for current_hand in hand:
+                dealer_logic(deck, current_hand)
+        elif player_split_aces != True and player_split_hand != True:
+            dealer_logic(deck, player_hand)
+    else:
+        pass
 
 # Hit method
 def hit(deck, hand):
@@ -305,15 +301,13 @@ def hit_stay_double_down(deck, hand):
 
 def play_hand(deck):
     global player_hand
-    global dealer_hand
-    dealer_hand_total = add_card_total(dealer_hand)
     player_hand = player_same_rank_check(deck)[0]
     if player_split_aces == True:
         print("Player Split Aces" "\n")
         print("Here are the final hands of the player:")
         for current_hand in player_hand:
             show_hand(current_hand)
-        dealer_play(deck, player_hand, dealer_hand_total)
+        dealer_play(deck, player_hand)
     elif player_split_hand == True:
         print("Player split their hand" "\n")
         print("Here are the current hands of the player:")
@@ -325,11 +319,10 @@ def play_hand(deck):
             hand_play_counter += 1
         for current_hand in player_hand:
             hit_stay_double_down(deck, current_hand)
-        dealer_play(deck, player_hand, dealer_hand_total)
+        dealer_play(deck, player_hand)
     elif player_split_aces != True and player_split_hand != True:
         hit_stay_double_down(deck, player_hand)
-        dealer_play(deck, player_hand, dealer_hand_total)
-    return 0
+        dealer_play(deck, player_hand)
 
 # Player same rank method
 def player_same_rank_check(deck):
@@ -398,16 +391,6 @@ def player_same_rank_check(deck):
     else:
         new_hand = player_hand
     return [new_hand, player_split_aces, player_split_hand]
-
-# Re-Assing Ace's value method
-def reassign_ace_value(hand):
-    for card in hand:
-        if card.rank == "Ace" and card.card_value == 11:
-            card.card_value = 1
-            break
-        else:
-            pass
-    return [hand]
 
 # Show hands of players method
 def show_hand(hand, dealer_display = None):
