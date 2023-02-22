@@ -61,12 +61,12 @@ class Deck:
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
-            Card("3", "Diamonds"),
-            Card("3", "Diamonds"),
+            Card("8", "Diamonds"),
+            Card("10", "Diamonds"),
             Card("Ace", "Diamonds"),
-            Card("2", "Hearts"),
             Card("Ace", "Diamonds"),
-            Card("2", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
         ]
         self.returned_cards = []
 
@@ -171,10 +171,20 @@ def deal(deck):
             hit(deck, player_hand)
         elif (turn % 2 == 1):
             hit(deck, dealer_hand)
-    if check_same_rank(player_hand, "Ace"):
-        player_hand[0].card_value = 11
-    if check_same_rank(dealer_hand, "Ace"):
-        dealer_hand[1].card_value = 11
+    player_aces = sum(card.rank == "Ace" for card in player_hand)
+    dealer_aces = sum(card.rank == "Ace" for card in dealer_hand)
+    for card in player_hand:
+        if player_aces == 1:
+            card.card_value = 11
+        elif player_aces > 1:
+            card.card_value = 1
+        player_aces -= 1
+    for card in dealer_hand:
+        if dealer_aces == 1:
+            card.card_value = 11
+        elif dealer_aces > 1:
+            card.card_value = 1
+        dealer_aces -= 1
     return [player_hand, dealer_hand]
 
 # Dealer logic method
@@ -183,7 +193,7 @@ def dealer_logic(deck, hand):
     global dealer_hand
     dealer_total = add_card_total(dealer_hand)
     player_total = add_card_total(hand)
-    while check_for_rank(dealer_hand[1], "Ace") and dealer_total < 17:
+    while check_for_rank_in_hand(dealer_hand, "Ace") and dealer_total < 17:
         hit(deck, dealer_hand)
         dealer_total = add_card_total(dealer_hand)
         print(f"Dealer hits, current hand: {dealer_hand} with total value of: {dealer_total}.")
@@ -247,10 +257,15 @@ def dealer_play(deck ,hand):
 def hit(deck, hand):
     card_drawn = deck.draw()
     hand.append(card_drawn)
-    if add_card_total(hand) > 21:
-        for card in hand:
-            if card.rank == "Ace":
-                card.card_value = 1
+    for card in hand:
+        if card.rank == "Ace":
+            card.card_value = 1
+    hand_total = add_card_total(hand)
+    for card in hand:
+        if card.rank == "Ace":
+            if hand_total <= 11:
+                card.card_value = 11
+                break
     return [hand]
 
 # Hit, Stay, Double Down method

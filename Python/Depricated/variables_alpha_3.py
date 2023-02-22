@@ -51,9 +51,9 @@ class Deck:
             Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
             Card("10", "Diamonds"),
-            Card("2", "Diamonds"),
             Card("Ace", "Diamonds"),
-            Card("2", "Diamonds"),
+            Card("Ace", "Diamonds"),
+            Card("Ace", "Diamonds"),
             Card("Ace", "Diamonds"),
         ]
         self.returned_cards = []
