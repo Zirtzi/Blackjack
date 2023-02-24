@@ -41,32 +41,36 @@ class Deck:
     def __init__(self):
         self.cards = [Card(rank, suit) for rank in ranks for suit in suits]
         self.rigged_cards = [
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("8", "Diamonds"),
-            Card("10", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
-            Card("Ace", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Diamonds"),
+            Card("King", "Spades"),
+            Card("King", "Clubs"),
+            Card("King", "Hearts"),
+            Card("King", "Diamonds"),
+            Card("King", "Spades"),
+            Card("King", "Clubs"),
+            Card("King", "Hearts"),
+            Card("King", "Spades"),
         ]
         self.returned_cards = []
 
@@ -175,16 +179,30 @@ def deal(deck):
     dealer_aces = sum(card.rank == "Ace" for card in dealer_hand)
     for card in player_hand:
         if player_aces == 1:
-            card.card_value = 11
+            if card.rank == "Ace":
+                card.card_value = 11
+            else:
+                pass
         elif player_aces > 1:
-            card.card_value = 1
+            if card.rank == "Ace":
+                card.card_value = 1
+            else:
+                pass
         player_aces -= 1
     for card in dealer_hand:
         if dealer_aces == 1:
-            card.card_value = 11
+            if card.rank == "Ace":
+                card.card_value = 11
+            else:
+                pass
         elif dealer_aces > 1:
-            card.card_value = 1
+            if card.rank == "Ace":
+                card.card_value = 1
+            else:
+                pass
         dealer_aces -= 1
+    show_hand(player_hand)
+    show_hand(dealer_hand)
     return [player_hand, dealer_hand]
 
 # Dealer logic method
@@ -193,10 +211,11 @@ def dealer_logic(deck, hand):
     global dealer_hand
     dealer_total = add_card_total(dealer_hand)
     player_total = add_card_total(hand)
-    while check_for_rank_in_hand(dealer_hand, "Ace") and dealer_total < 17:
-        hit(deck, dealer_hand)
-        dealer_total = add_card_total(dealer_hand)
-        print(f"Dealer hits, current hand: {dealer_hand} with total value of: {dealer_total}.")
+    if player_total <= 21:
+        while dealer_total < 17:
+            hit(deck, dealer_hand)
+            dealer_total = add_card_total(dealer_hand)
+            print(f"Dealer hits, current hand: {dealer_hand} with total value of: {dealer_total}.")
     print("\n")
     if player_total > 21:
         print(f"Player has busted with a final value of {player_total}. Player loses. Here are the final hands:")
@@ -225,7 +244,7 @@ def dealer_logic(deck, hand):
 
 # Dealer play method
 def dealer_play(deck ,hand):
-    print("\n" "The dealer will now play their hand.")
+    dealer_total = add_card_total(dealer_hand)
     player_totals = []
     all_over_21 = False
     if isinstance(hand, list) and not any(isinstance(hands, list) for hands in hand):
@@ -239,6 +258,7 @@ def dealer_play(deck ,hand):
         if current_total < 21:
             all_over_21 = False
             break
+    print("\n" "The dealer will now play their hand.")
     if all_over_21:
         print("\n" "The player has on both hands therefore the dealer has won both hands. Here are the final hands:")
         for current_hand in hand:
@@ -275,11 +295,14 @@ def hit_stay_double_down(deck, hand):
     response = ""
     while response not in ["h", "s", "d"] and player_hand_total < 21:
         if not has_hit:
+            print("\n" "Your current hand is:")
+            show_hand(hand)
             response = input("\n" f"Would you like to hit, stay, or double down on your current hand? (h/s/d): ")
             print("\n")
         elif has_hit:
-            print("\n")
-            response = input(f"Would you like to hit or stay? (h/s): ")
+            print("\n" "Your current hand is:")
+            show_hand(hand)
+            response = input("\n" f"Would you like to hit or stay? (h/s): ")
             print("\n")
         if response.lower() == "h":
             has_hit = True
@@ -314,26 +337,107 @@ def hit_stay_double_down(deck, hand):
             continue
     return [hand]
 
+# Flurdbop Method
 def play_hand(deck):
+    global player_hand
+    global dealer_hand
+    if dealer_hand[1].rank == "Ace":
+        insurance_choice = ""
+        while insurance_choice not in ["y", "n"]:
+            insurance_choice = input("\n" f"The dealer is showing an {dealer_hand[1].rank},"
+                                     f" would you like to buy insurance? (y/n): ")
+            if insurance_choice.lower() == "y":
+                print("\n" "The player has chosen to buy insurance. We will now check for if the dealer"
+                      " has blackjack.")
+                if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
+                    print("\n" "Both players have blackjack, it is a push. Player wins insurance.")
+                    show_hand(player_hand)
+                    show_hand(dealer_hand, 1)
+                    break
+                elif check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand) == False:
+                    print("\n" "The dealer has blackjack, player wins insurance.")
+                    show_hand(player_hand)
+                    show_hand(dealer_hand, 1)
+                    break
+                elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand):
+                    print("\n" "The player has blackjack, the dealer does not. Player loses insurance"
+                          " but wins the hand.")
+                    show_hand(player_hand)
+                    show_hand(dealer_hand, 1)
+                    break
+                elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == False:
+                    print("\n" "Neither player has blackjack, player loses insurance. The hand will continue.")
+                    show_hand(player_hand)
+                    show_hand(dealer_hand)
+                    player_hand_logic(deck)
+            elif insurance_choice.lower() == "n":
+                print("\n" "The player has chosen to not play insurance. We will now check for if the dealer"
+                      " has blackjack.")
+                if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
+                    print("\n" "Both players have blackjack, it is a push.")
+                    show_hand(player_hand)
+                    show_hand(dealer_hand, 1)
+                    break
+                elif check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand) == False:
+                    print("\n" "The dealer has blackjack, the player does not. Player loses.")
+                    show_hand(player_hand)
+                    show_hand(dealer_hand, 1)
+                    break
+                elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand):
+                    print("\n" "The dealer does not have blackjack, but the player does. Player wins.")
+                    show_hand(player_hand)
+                    show_hand(dealer_hand, 1)
+                    break
+                elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == False:
+                    print("\n" "Neither player has blackjack. The hand will continue.")
+                    show_hand(player_hand)
+                    show_hand(dealer_hand)
+                    player_hand_logic(deck)
+            else:
+                print("\n" "\033[1;31;40mInvalid choice\033[0m" "\n")
+                continue
+    if dealer_hand[1].rank != "Ace":
+        if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
+            print("\n" "Both players have blackjack. It is a push.")
+            show_hand(player_hand)
+            show_hand(dealer_hand, 1)
+        elif check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand) == False:
+            print("\n" "The dealer has blackjack, the player does not. Player loses.")
+            show_hand(player_hand)
+            show_hand(dealer_hand, 1)
+        elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand):
+            print("\n" "The player has blackjack, the dealer does not. Player wins.")
+            show_hand(player_hand)
+            show_hand(dealer_hand, 1)
+        elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == False:
+            player_hand_logic(deck)
+        else:
+            raise ValueError("A fatal error has occured.")
+
+# Player hand logic
+def player_hand_logic(deck):
     global player_hand
     player_hand = player_same_rank_check(deck)[0]
     if player_split_aces == True:
-        print("Player Split Aces" "\n")
-        print("Here are the final hands of the player:")
+        print("\n" "Here are the final hands of the player:")
         for current_hand in player_hand:
             show_hand(current_hand)
         dealer_play(deck, player_hand)
     elif player_split_hand == True:
-        print("Player split their hand" "\n")
         print("Here are the current hands of the player:")
-        hand_play_counter = 1
         for current_hand in player_hand:
-            if hand_play_counter >= 2:
-                hit(deck, current_hand)
             show_hand(current_hand)
-            hand_play_counter += 1
+        hand_counter = 1
         for current_hand in player_hand:
+            if hand_counter > 1:
+                hit(deck, current_hand)
+            else:
+                pass
             hit_stay_double_down(deck, current_hand)
+            hand_counter += 1
+        print("\n" "The final hands of the player are: ")
+        for current_hand in player_hand:
+            show_hand(current_hand)
         dealer_play(deck, player_hand)
     elif player_split_aces != True and player_split_hand != True:
         hit_stay_double_down(deck, player_hand)
