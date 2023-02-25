@@ -7,7 +7,6 @@ suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
 ranks = ["Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"]
 
 # Players array
-global players
 players = ["Player 1", "Dealer"]
 
 # Player hands
@@ -41,26 +40,38 @@ class Deck:
     def __init__(self):
         self.cards = [Card(rank, suit) for rank in ranks for suit in suits]
         self.rigged_cards = [
-            Card("King", "Diamonds"),
-            Card("King", "Clubs"),
-            Card("King", "Hearts"),
-            Card("King", "Spades"),
-            Card("King", "Cash"),
-            Card("King", "Hill"),
-            Card("King", "Titties"),
-            Card("King", "Ass"),
-            Card("King", "Diamonds"),
-            Card("King", "Clubs"),
-            Card("King", "Hearts"),
-            Card("King", "Hearts"),
-            Card("King", "Spades"),
-            Card("King", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Ace", "Spades"),
+            Card("Ace", "Spades"),
+            Card("Ace", "Spades"),
+            Card("Ace", "Spades"),
+            Card("Ace", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("2", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
+            Card("Jack", "Spades"),
         ]
         self.returned_cards = []
 
     def draw(self):
-        # return self.cards.pop()
-        return self.rigged_cards.pop()
+        return self.cards.pop()
+        # return self.rigged_cards.pop()
 
     def deal_cards(self):
         print("\n")
@@ -74,8 +85,10 @@ class Deck:
             card_dealt_number += 1
         self.cards = self.returned_cards
         self.cards.reverse()
-        print(len(self.cards))
+        print(len(self.cards), " Cards remaining")
         print("\n")
+        time.sleep(1)
+
 
     def deal_rigged_order(self):
         print("\n")
@@ -199,27 +212,34 @@ def dealer_logic(deck, hand):
         while dealer_total < 17:
             hit(deck, dealer_hand)
             dealer_total = add_card_total(dealer_hand)
-            print(f"Dealer hits, current hand: {dealer_hand} with total value of: {dealer_total}.")
+            time.sleep(1)
+            print(f"Dealer hits, current hand: {dealer_hand} with a current total"
+                  f" of \033[1;31;40m{dealer_total}\033[0m")
     print("\n")
     if player_total > 21:
+        time.sleep(1)
         print(f"Player has busted with a final value of {player_total}. Player loses. Here are the final hands:")
         show_hand(hand)
         show_hand(dealer_hand, 1)
     elif player_total <= 21:
         if dealer_total == player_total:
+            time.sleep(1)
             print(f"Both players have the same final value of {player_total}. It is a push. Here are the final"
                   f" hands.")
             show_hand(hand)
             show_hand(dealer_hand, 1)
         elif dealer_total > player_total and dealer_total <= 21:
+            time.sleep(1)
             print(f"Dealer has a greater final value of {dealer_total}. Player loses. Here are the final hands:")
             show_hand(hand)
             show_hand(dealer_hand, 1)
         elif dealer_total < player_total:
+            time.sleep(1)
             print(f"Player has a greater final value of {player_total}. Player wins. Here are the final hands:")
             show_hand(hand)
             show_hand(dealer_hand, 1)
         elif dealer_total > 21:
+            time.sleep(1)
             print(f"Dealer has busted with a final value of {dealer_total}. Player wins. Here are the final hands:")
             show_hand(hand)
             show_hand(dealer_hand, 1)
@@ -228,7 +248,6 @@ def dealer_logic(deck, hand):
 
 # Dealer play method
 def dealer_play(deck ,hand):
-    dealer_total = add_card_total(dealer_hand)
     player_totals = []
     all_over_21 = False
     if isinstance(hand, list) and not any(isinstance(hands, list) for hands in hand):
@@ -242,17 +261,22 @@ def dealer_play(deck ,hand):
         if current_total < 21:
             all_over_21 = False
             break
+    time.sleep(1)
     print("\n" "The dealer will now play their hand.")
     if all_over_21:
+        time.sleep(1)
         print("\n" "The player has on both hands therefore the dealer has won both hands. Here are the final hands:")
         for current_hand in hand:
+            time.sleep(1)
             show_hand(current_hand)
         show_hand(dealer_hand,1)
     elif all_over_21 == False:
         if player_split_aces == True or player_split_hand == True:
             for current_hand in hand:
+                time.sleep(1)
                 dealer_logic(deck, current_hand)
         elif player_split_aces != True and player_split_hand != True:
+            time.sleep(1)
             dealer_logic(deck, player_hand)
     else:
         pass
@@ -279,13 +303,17 @@ def hit_stay_double_down(deck, hand):
     response = ""
     while response not in ["h", "s", "d"] and player_hand_total < 21:
         if not has_hit:
+            time.sleep(1)
             print("\n" "Your current hand is:")
             show_hand(hand)
+            time.sleep(1)
             response = input("\n" f"Would you like to hit, stay, or double down on your current hand? (h/s/d): ")
             print("\n")
         elif has_hit:
+            time.sleep(1)
             print("\n" "Your current hand is:")
             show_hand(hand)
+            time.sleep(1)
             response = input("\n" f"Would you like to hit or stay? (h/s): ")
             print("\n")
         if response.lower() == "h":
@@ -293,28 +321,42 @@ def hit_stay_double_down(deck, hand):
             hit(deck, hand)
             player_hand_total = add_card_total(hand)
             if player_hand_total > 21:
-                print(f"Player has busted with a final value of {player_hand_total}.")
+                time.sleep(1)
+                print(f"Player has busted with a final value of \033[1;31;40m{player_hand_total}\033[0m.")
+                time.sleep(1)
                 show_hand(hand)
                 break
             elif player_hand_total < 21:
-                print(f"Player hits, current hand: {hand} with a total value of {player_hand_total}")
+                time.sleep(1)
+                print(f"Player hits current hand.")
+                time.sleep(1)
             elif player_hand_total == 21:
-                print(f"Player has {player_hand_total}. No more cards will be accepted.")
+                time.sleep(1)
+                print(f"Player has \033[1;31;40m{player_hand_total}\033[0m. No more cards will be accepted.")
+                time.sleep(1)
                 show_hand(hand)
             response = ""
         elif response.lower() == "s":
+            time.sleep(1)
             player_hand_total = add_card_total(hand)
-            print(f"Player has chosen to stay, current hand: {hand} with a total value of {player_hand_total}")
+            print(f"Player has chosen to stay, current hand: {hand}"
+                  f" with a current total of \033[1;31;40m{player_hand_total}\033[0m")
+            time.sleep(1)
             show_hand(hand)
         elif response.lower() == "d" and not has_hit:
             hit(deck, hand)
             player_hand_total = add_card_total(hand)
             if player_hand_total > 21:
-                print(f"Player has doubled down and busted, current hand: {hand}, with a total value of "
-                      f"{player_hand_total}")
+                time.sleep(1)
+                print(f"Player has doubled down and busted, current hand: {hand}, with a current total of "
+                      f"\033[1;31;40m{player_hand_total}\033[0m")
+                time.sleep(1)
                 show_hand(hand)
             elif player_hand_total <= 21:
-                print(f"Player has doubled down, current hand: {hand}, with a total value of {player_hand_total}")
+                time.sleep(1)
+                print(f"Player has doubled down, current hand: {hand}, with a current total"
+                      f" of \033[1;31;40m{player_hand_total}\033[0m")
+                time.sleep(1)
                 show_hand(hand)
         else:
             print("\033[1;31;40mInvalid choice\033[0m." "\n")
@@ -326,54 +368,66 @@ def play_hand(deck):
     global player_hand
     global dealer_hand
     if dealer_hand[1].rank == "Ace":
+        time.sleep(1)
         insurance_choice = ""
         while insurance_choice not in ["y", "n"]:
             insurance_choice = input("\n" f"The dealer is showing an {dealer_hand[1].rank},"
                                      f" would you like to buy insurance? (y/n): ")
+            time.sleep(1)
             if insurance_choice.lower() == "y":
                 print("\n" "The player has chosen to buy insurance. We will now check for if the dealer"
                       " has blackjack.")
+                time.sleep(1)
                 if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
                     print("\n" "Both players have blackjack, it is a push. Player wins insurance.")
+                    time.sleep(1)
                     show_hand(player_hand)
                     show_hand(dealer_hand, 1)
                     break
                 elif check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand) == False:
                     print("\n" "The dealer has blackjack, player wins insurance.")
+                    time.sleep(1)
                     show_hand(player_hand)
                     show_hand(dealer_hand, 1)
                     break
                 elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand):
                     print("\n" "The player has blackjack, the dealer does not. Player loses insurance"
                           " but wins the hand.")
+                    time.sleep(1)
                     show_hand(player_hand)
                     show_hand(dealer_hand, 1)
                     break
                 elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == False:
                     print("\n" "Neither player has blackjack, player loses insurance. The hand will continue.")
+                    time.sleep(1)
                     show_hand(player_hand)
                     show_hand(dealer_hand)
                     player_hand_logic(deck)
             elif insurance_choice.lower() == "n":
                 print("\n" "The player has chosen to not play insurance. We will now check for if the dealer"
                       " has blackjack.")
+                time.sleep(1)
                 if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
                     print("\n" "Both players have blackjack, it is a push.")
+                    time.sleep(1)
                     show_hand(player_hand)
                     show_hand(dealer_hand, 1)
                     break
                 elif check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand) == False:
                     print("\n" "The dealer has blackjack, the player does not. Player loses.")
+                    time.sleep(1)
                     show_hand(player_hand)
                     show_hand(dealer_hand, 1)
                     break
                 elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand):
                     print("\n" "The dealer does not have blackjack, but the player does. Player wins.")
+                    time.sleep(1)
                     show_hand(player_hand)
                     show_hand(dealer_hand, 1)
                     break
                 elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == False:
                     print("\n" "Neither player has blackjack. The hand will continue.")
+                    time.sleep(1)
                     show_hand(player_hand)
                     show_hand(dealer_hand)
                     player_hand_logic(deck)
@@ -381,35 +435,52 @@ def play_hand(deck):
                 print("\n" "\033[1;31;40mInvalid choice\033[0m" "\n")
                 continue
     if dealer_hand[1].rank != "Ace":
+        time.sleep(1)
         if check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand):
             print("\n" "Both players have blackjack. It is a push.")
+            time.sleep(1)
             show_hand(player_hand)
             show_hand(dealer_hand, 1)
         elif check_for_blackjack(dealer_hand) and check_for_blackjack(player_hand) == False:
             print("\n" "The dealer has blackjack, the player does not. Player loses.")
+            time.sleep(1)
             show_hand(player_hand)
             show_hand(dealer_hand, 1)
         elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand):
             print("\n" "The player has blackjack, the dealer does not. Player wins.")
+            time.sleep(1)
             show_hand(player_hand)
             show_hand(dealer_hand, 1)
         elif check_for_blackjack(dealer_hand) == False and check_for_blackjack(player_hand) == False:
+            time.sleep(1)
             player_hand_logic(deck)
         else:
             raise ValueError("A fatal error has occured.")
+    global player_split_aces
+    global player_split_hand
+    player_hand.clear()
+    dealer_hand.clear()
+    player_split_aces = None
+    player_split_hand = None
+    time.sleep(2)
 
 # Player hand logic
 def player_hand_logic(deck):
     global player_hand
     player_hand = player_same_rank_check(deck)[0]
     if player_split_aces == True:
+        time.sleep(1)
         print("\n" "Here are the final hands of the player:")
         for current_hand in player_hand:
+            time.sleep(1)
             show_hand(current_hand)
+        time.sleep(1)
         dealer_play(deck, player_hand)
     elif player_split_hand == True:
+        time.sleep(1)
         print("Here are the current hands of the player:")
         for current_hand in player_hand:
+            time.sleep(1)
             show_hand(current_hand)
         hand_counter = 1
         for current_hand in player_hand:
@@ -419,12 +490,17 @@ def player_hand_logic(deck):
                 pass
             hit_stay_double_down(deck, current_hand)
             hand_counter += 1
+        time.sleep(1)
         print("\n" "The final hands of the player are: ")
         for current_hand in player_hand:
+            time.sleep(1)
             show_hand(current_hand)
+        time.sleep(1)
         dealer_play(deck, player_hand)
     elif player_split_aces != True and player_split_hand != True:
+        time.sleep(1)
         hit_stay_double_down(deck, player_hand)
+        time.sleep(1)
         dealer_play(deck, player_hand)
 
 # Player same rank method
@@ -432,11 +508,13 @@ def player_same_rank_check(deck):
     global player_split_aces
     global player_split_hand
     if check_same_rank(player_hand, "Ace"):
+        time.sleep(1)
         aces_response = ""
         while (aces_response not in ["y", "n"]):
             aces_response = input("\n" f"You have two {player_hand[0].rank}'s in your hand. Would you like to split"
                                   f" your hand? You may only split your hand once. (y/n): ")
             if aces_response.lower() == "y":
+                time.sleep(1)
                 print("\n" f"You have chosen to split your {player_hand[0].rank}'s." "\n")
                 hand_1 = split_hand(player_hand)[0][0]
                 hand_2 = split_hand(player_hand)[0][1]
@@ -464,18 +542,22 @@ def player_same_rank_check(deck):
                 new_hand = [hand_1, hand_2]
                 break
             elif aces_response.lower() == "n":
+                time.sleep(1)
                 print("\n" f"You have chosen not to split your {player_hand[0].rank}'s." "\n")
                 player_split_aces = False
                 new_hand = player_hand
+                break
             else:
                 print("\n" "\033[1;31;40mInvalid choice\033[0m." "\n")
                 continue
-    elif check_same_rank(player_hand):
+    elif check_same_rank(player_hand) and check_same_rank(player_hand, "Ace") == False:
+        time.sleep(1)
         same_rank_response = ""
         while same_rank_response not in ["y", "n"]:
             same_rank_response = input("\n" f"You have the same rank of {player_hand[0].rank} in your hand. Would you like"
                                        f" to split your hand? (y/n): ")
             if same_rank_response.lower() == "y":
+                time.sleep(1)
                 print("\n" f"You have chosen to split your {player_hand[0].rank}'s." "\n")
                 hand_1 = split_hand(player_hand)[0][1]
                 hand_2 = split_hand(player_hand)[0][0]
@@ -484,60 +566,89 @@ def player_same_rank_check(deck):
                 split_hands = []
                 checking_hand = hand_1
                 if check_same_rank(checking_hand):
-                    print("Same rank again")
+                    time.sleep(1)
+                    print(f"You have pulled the same rank of {checking_hand[1].rank} again. Here are your current"
+                          f" hands:")
+                    show_hand(checking_hand)
+                    show_hand(hand_2)
                     split_counter = 1
                     while split_counter <= 3 and check_same_rank(checking_hand):
+                        time.sleep(1)
                         split_again_choice = ""
                         while split_again_choice not in ["y", "n"]:
-                            split_again_choice = input("Split again? ")
+                            split_again_choice = input("\n" f"Would you like to split your {checking_hand[1].rank}'s"
+                                                       f" again? (y/n): ")
                             if split_again_choice.lower() == "y":
+                                split_counter += 1
+                                time.sleep(1)
+                                print("\n" f"You have chosen to split your hand again."
+                                      f" Total times split: {split_counter}")
                                 new_hand_1 = split_hand(checking_hand)[0][1]
                                 new_hand_2 = split_hand(checking_hand)[0][0]
                                 split_hands.insert(0, new_hand_2)
                                 hit(deck, new_hand_1)
                                 checking_hand = new_hand_1
-                                split_counter += 1
-                                print("Times split, ", split_counter)
+                                time.sleep(1)
                                 break
                             elif split_again_choice.lower() == "n":
-                                print("Total times split, ", split_counter)
+                                time.sleep(1)
                                 break
                             else:
-                                print("Invalid choice")
+                                print("\n" "\033[1;31;40mInvalid choice\033[0m.")
                                 continue
                         if check_same_rank(checking_hand) and split_again_choice.lower() == "y":
-                            print("Same rank pulled again.")
-                            if split_counter == 4:
+                            if split_counter < 4:
+                                print("\n" "Your current hands are: ")
+                                split_hands.insert(0, checking_hand)
+                                split_hands.append(hand_2)
+                                for current_hand in split_hands:
+                                    show_hand(current_hand)
+                                split_hands.remove(checking_hand)
+                                split_hands.remove(hand_2)
+                            elif split_counter == 4:
+                                time.sleep(1)
+                                print("\n" f"You can no longer split your hands. Times split: {split_counter}" "\n")
                                 split_hands.insert(0, checking_hand)
                             else:
                                 pass
                             continue
                         elif check_same_rank(checking_hand) == False or split_again_choice.lower() == "n":
-                            print("User has decided to break loop / new rank does not match again.")
+                            if check_same_rank(checking_hand) == False:
+                                time.sleep(1)
+                                print("\n" f"You did not pull the same rank of {checking_hand[0].rank} again."
+                                      f" Total times split: {split_counter}" "\n")
+                            elif split_again_choice.lower() == "n":
+                                time.sleep(1)
+                                print("\n" f"You have chosen to not split your hand again."
+                                      f" Total times split: {split_counter}" "\n")
+                            else:
+                                pass
                             split_hands.insert(0, checking_hand)
                             break
                         else:
-                            raise ValueError("A catastrophic error has occurred.")
+                            raise ValueError("\033[1;31;40mA catastrophic error has occurred.\033[0m")
                             break
                     split_hands.append(hand_2)
-                    print("Split hands, ", split_hands)
                 elif check_same_rank(checking_hand) == False:
-                    print("Not same rank")
                     split_hands.insert(0, hand_1)
                     split_hands.append(hand_2)
                 else:
                     pass
                 new_hand = split_hands
+                time.sleep(1)
                 break
             elif same_rank_response.lower() == "n":
+                time.sleep(1)
                 print("\n" f"You have chosen not to split your {player_hand[0].rank}'s." "\n")
                 player_split_hand = False
                 new_hand = player_hand
+                time.sleep(1)
                 break
             else:
                 print("\n" "\033[1;31;40mInvalid choice\033[0m." "\n")
                 continue
     else:
+        time.sleep(1)
         new_hand = player_hand
     return [new_hand, player_split_aces, player_split_hand]
 
@@ -546,13 +657,15 @@ def show_hand(hand, dealer_display = None):
     if hand != dealer_hand:
         if isinstance(hand, list) and isinstance(hand[0], list):
             for current_hand in hand:
-                print(f"{players[0]}'s current hand is: {current_hand} {add_card_total(current_hand)}")
-        else:
-            print(f"{players[0]}'s hand is: {hand} {add_card_total(hand)}")
+                print(f"{players[0]}'s current hand is: {current_hand} with a"
+                      f" current total of \033[1;31;40m{add_card_total(current_hand)}\033[0m")
+        elif isinstance(hand, list) and not isinstance(hand[0], list):
+            print(f"{players[0]}'s hand is: {hand} with a current total of \033[1;31;40m{add_card_total(hand)}\033[0m")
     elif hand == dealer_hand and dealer_display is None:
-        print(f"{players[-1]}'s hand is: [Hidden, {hand[1]}] {hand[1].card_value}")
+        print(f"{players[-1]}'s hand is: [Hidden, {hand[1]}] with a current total"
+              f" of \033[1;31;40m{hand[1].card_value}\033[0m")
     elif hand == dealer_hand and dealer_display is not None:
-        print(f"{players[-1]}'s hand is {hand} {add_card_total(hand)}")
+        print(f"{players[-1]}'s hand is {hand} with a current total of \033[1;31;40m{add_card_total(hand)}\033[0m")
 
 # Split hand method
 def split_hand(hand):
