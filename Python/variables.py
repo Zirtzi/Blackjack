@@ -1,5 +1,5 @@
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Imports ----- ----- ----- ----- ----- ----- ----- ----- ----- #
-import random
+import random, time
 
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Arrays ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 # Creating suits and ranks for cards
@@ -42,34 +42,18 @@ class Deck:
         self.cards = [Card(rank, suit) for rank in ranks for suit in suits]
         self.rigged_cards = [
             Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Diamonds"),
-            Card("King", "Spades"),
             Card("King", "Clubs"),
             Card("King", "Hearts"),
-            Card("King", "Diamonds"),
             Card("King", "Spades"),
+            Card("King", "Cash"),
+            Card("King", "Hill"),
+            Card("King", "Titties"),
+            Card("King", "Ass"),
+            Card("King", "Diamonds"),
             Card("King", "Clubs"),
             Card("King", "Hearts"),
+            Card("King", "Hearts"),
+            Card("King", "Spades"),
             Card("King", "Spades"),
         ]
         self.returned_cards = []
@@ -493,11 +477,57 @@ def player_same_rank_check(deck):
                                        f" to split your hand? (y/n): ")
             if same_rank_response.lower() == "y":
                 print("\n" f"You have chosen to split your {player_hand[0].rank}'s." "\n")
-                hand_1 = split_hand(player_hand)[0][0]
-                hand_2 = split_hand(player_hand)[0][1]
+                hand_1 = split_hand(player_hand)[0][1]
+                hand_2 = split_hand(player_hand)[0][0]
                 hit(deck, hand_1)
                 player_split_hand = True
-                new_hand = [hand_1, hand_2]
+                split_hands = []
+                checking_hand = hand_1
+                if check_same_rank(checking_hand):
+                    print("Same rank again")
+                    split_counter = 1
+                    while split_counter <= 3 and check_same_rank(checking_hand):
+                        split_again_choice = ""
+                        while split_again_choice not in ["y", "n"]:
+                            split_again_choice = input("Split again? ")
+                            if split_again_choice.lower() == "y":
+                                new_hand_1 = split_hand(checking_hand)[0][1]
+                                new_hand_2 = split_hand(checking_hand)[0][0]
+                                split_hands.insert(0, new_hand_2)
+                                hit(deck, new_hand_1)
+                                checking_hand = new_hand_1
+                                split_counter += 1
+                                print("Times split, ", split_counter)
+                                break
+                            elif split_again_choice.lower() == "n":
+                                print("Total times split, ", split_counter)
+                                break
+                            else:
+                                print("Invalid choice")
+                                continue
+                        if check_same_rank(checking_hand) and split_again_choice.lower() == "y":
+                            print("Same rank pulled again.")
+                            if split_counter == 4:
+                                split_hands.insert(0, checking_hand)
+                            else:
+                                pass
+                            continue
+                        elif check_same_rank(checking_hand) == False or split_again_choice.lower() == "n":
+                            print("User has decided to break loop / new rank does not match again.")
+                            split_hands.insert(0, checking_hand)
+                            break
+                        else:
+                            raise ValueError("A catastrophic error has occurred.")
+                            break
+                    split_hands.append(hand_2)
+                    print("Split hands, ", split_hands)
+                elif check_same_rank(checking_hand) == False:
+                    print("Not same rank")
+                    split_hands.insert(0, hand_1)
+                    split_hands.append(hand_2)
+                else:
+                    pass
+                new_hand = split_hands
                 break
             elif same_rank_response.lower() == "n":
                 print("\n" f"You have chosen not to split your {player_hand[0].rank}'s." "\n")
