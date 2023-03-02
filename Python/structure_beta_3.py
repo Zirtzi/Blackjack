@@ -1,5 +1,5 @@
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Imports ----- ----- ----- ----- ----- ----- ----- ----- ----- #
-import random, time
+import random, time, decimal
 
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Arrays ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 # Creating suits and ranks for cards
@@ -10,6 +10,9 @@ Ranks = ["Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "
 # Split hand booleans
 Player_Split_Aces = None
 Player_Split_Hand = None
+
+# Player bank
+Player_Bank = 0.0
 
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Classes ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 # Card Class
@@ -126,10 +129,18 @@ class Player_Hand:
         self.hand_value = sum(card.Value_of_Card() for card in self.cards)
         return int(self.hand_value)
 
+    # Hit hand method
     def Hit_Hand(self, deck):
         card_drawn = deck.Draw()
         self.Add_Card_To_Hand(card_drawn)
         return Player_Hand
+
+    # Place wager method
+    def Place_Bet(self, wager):
+        global Player_Bank
+        self.wager = wager
+        Player_Bank -= wager
+        return Player_Bank
 
     # Show hand method
     def Show_Hand(self):
@@ -187,6 +198,12 @@ class Dealer_Hand:
                   f" Hand Total: \033[1;31;40m{self.hand_value}\033[0m")
 
 # ----- ----- ----- ----- ----- ----- ----- Game Methods ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #
+# Bank prompt method
+def bank_prompt():
+    global Player_Bank
+    Player_Bank = float(input("Enter the amount you'd like to play with: "))
+    return Player_Bank
+
 # Check for rank of card method
 def check_rank_of_card(card, checking_rank):
     result = False
@@ -449,6 +466,30 @@ def play_hand(deck, dealer_hand, player_hand):
     # Import global variables to be modified
     global Player_Split_Aces
     global Player_Split_Hand
+    global Player_Bank
+    # Take bet for current hand
+    hand_bet = 0
+    while hand_bet == 0:
+        hand_bet = float(input("Place your bet for the current hand: "))
+        if hand_bet > Player_Bank or hand_bet == 0:
+            if hand_bet > Player_Bank:
+                print("\n" f"You have entered a wager of \033[1;31;40m{hand_bet}\033[0m"
+                      f" that is larger than your current bank of \033[1;31;40m{Player_Bank}\033[0m."
+                      f" Please re-enter your bet." "\n")
+                hand_bet = 0
+                continue
+            elif hand_bet == 0:
+                print("\n" f"You cannont enter a bet of \033[1;31;40m{hand_bet}\033[0m. Pleae enter your bet"
+                      f" again." "\n")
+                hand_bet = 0
+                continue
+        elif hand_bet <= Player_Bank:
+            player_hand.Place_Bet(hand_bet)
+            print(f"You have placed a bet of \033[1;31;40m{hand_bet}\033[0m. Your current bank total is:"
+                  f" \033[1;31;40m{Player_Bank}\033[0m.")
+            break
+        else:
+            continue
     # Deal hand and start processing logic
     deal_hand(deck, dealer_hand, player_hand)
     if dealer_hand.cards[1].rank == "Ace":
@@ -528,7 +569,7 @@ def play_hand(deck, dealer_hand, player_hand):
             else:
                 print("\n" "\033[1;31;40mInvalid choice\033[0m" "\n")
                 continue
-    if dealer_hand.cards[1].rank != "Ace":
+    elif dealer_hand.cards[1].rank != "Ace":
         if check_for_blackjack(dealer_hand.cards) and check_for_blackjack(player_hand.cards):
             time.sleep(1)
             print("\n" "Both players have blackjack, it is a \033[1;31;40mpush\033[0m.")
@@ -553,6 +594,8 @@ def play_hand(deck, dealer_hand, player_hand):
             dealer_hand.Show_Hand(1)
         elif check_for_blackjack(dealer_hand.cards) == False and check_for_blackjack(player_hand.cards) == False:
             player_hand_logic(deck, dealer_hand, player_hand)
+    else:
+        pass
     # Reset global variables
     if isinstance(player_hand, list):
         for current_hand in player_hand:
@@ -567,12 +610,12 @@ def play_hand(deck, dealer_hand, player_hand):
     dealer_hand.hand_value = 0
     Player_Split_Aces = None
     Player_Split_Hand = None
-    if len(deck.cards) >= 13:
+    if len(deck.cards) >= 13 and Player_Bank > 0:
         print("\n" "Dealing new hand." "\n")
     else:
         print("\n")
     time.sleep(2)
-    return [player_hand, dealer_hand, Player_Split_Aces, Player_Split_Hand]
+    return [player_hand, dealer_hand, Player_Split_Aces, Player_Split_Hand, Player_Bank]
 
 # Player logic method
 def player_hand_logic(deck, dealer_hand, player_hand):
