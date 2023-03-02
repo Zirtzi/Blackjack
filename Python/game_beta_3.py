@@ -1,8 +1,16 @@
 from structure_beta_3 import *
 
 deck = Deck()
-deck.Deal_Rigged_Cards()
-player_hand = Hand("Player")
-player_hand.Add_Card_To_Hand(Card("Ace", "Spades"))
-player_hand.Add_Card_To_Hand(Card("Ace", "Spades"))
-player_hand.Show_Hand()
+deck.Shuffle()
+player_hand = Player_Hand("Player")
+dealer_hand = Dealer_Hand()
+while len(deck.cards) >= 13:
+    print("Cards remaining: ", len(deck.cards))
+    play_hand(deck, dealer_hand, player_hand)
+    if len(deck.cards) < 13:
+        print("\n" "A new deck is being shuffled")
+        deck = Deck()
+        deck.Shuffle()
+        continue
+    else:
+        continue
