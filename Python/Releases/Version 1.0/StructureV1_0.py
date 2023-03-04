@@ -1,5 +1,5 @@
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Imports ----- ----- ----- ----- ----- ----- ----- ----- ----- #
-import random, time, decimal
+import random, time
 
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- Arrays ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 # Creating suits and ranks for cards
@@ -457,10 +457,15 @@ def hit_stay_double_down(deck, dealer_hand, player_hand):
         if not has_hit:
             print("\n")
             time.sleep(1)
-            player_hand.Show_Hand("initial")
-            time.sleep(1)
-            dealer_hand.Show_Hand(None, "initial")
-            time.sleep(1)
+            if Player_Split_Aces == True or Player_Split_Hand == True:
+                player_hand.Show_Hand("current")
+                time.sleep(1)
+                dealer_hand.Show_Hand(None, "initial")
+                time.sleep(1)
+            elif Player_Split_Aces != True and Player_Split_Hand != True:
+                pass
+            else:
+                pass
             response = input("\n" f"Would you like to hit, stay, or double down on your current hand?"
                              f" \033[1;32;40m(h/s/d)\033[0m: ")
             print("\n")

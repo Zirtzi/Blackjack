@@ -1,4 +1,4 @@
-from structure_beta_3 import *
+from StructureV1_0 import *
 deck = Deck()
 deck.Shuffle()
 dealer_hand = Dealer_Hand()
@@ -14,8 +14,9 @@ while len(deck.cards) >= 13 and Player_Bank > 0:
         continue
     elif len(deck.cards) < 13 and Player_Bank > 0:
         print("\n" f"Shuffling a new deck. \033[1;33;40m{player_hand.name}\033[0m bank:"
-              f" \033[1;31;40m{Player_Bank}\033[0m with \033[1;31;40m{len(deck.cards)}\033[0m"
+              f" \033[1;31;40m{Player_Bank}\033[0m \033[1;31;40m{len(deck.cards)}\033[0m"
               f" cards were left in the last deck." "\n")
+        deck.Deal_Cards()
         deck = Deck()
         deck.Shuffle()
         time.sleep(1)
