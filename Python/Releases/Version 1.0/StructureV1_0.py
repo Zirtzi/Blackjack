@@ -615,7 +615,7 @@ def play_hand(deck, dealer_hand, player_hand):
                     break
                 elif check_for_blackjack(dealer_hand.cards) and check_for_blackjack(player_hand.cards) == False:
                     time.sleep(1)
-                    print("\n" "The dealer has blackjack, \033[1;31;40mplayer wins insurance\033[0m"
+                    print("\n" f"The dealer has blackjack, \033[1;31;40mplayer wins insurance\033[0m"
                           " but loses the hand.")
                     time.sleep(1)
                     player_hand.Show_Hand("final")
@@ -637,7 +637,7 @@ def play_hand(deck, dealer_hand, player_hand):
                     break
                 elif check_for_blackjack(dealer_hand.cards) == False and check_for_blackjack(player_hand.cards) == False:
                     time.sleep(1)
-                    print("\n" "Neither player has blackjack, \033[1;31;40mplayer loses insurance\033[0m."
+                    print("\n" f"Neither player has blackjack, \033[1;31;40m{player_hand.name} loses insurance\033[0m."
                           " The hand will continue.")
                     Player_Bank -= insurance_wager
                     player_hand_logic(deck, dealer_hand, player_hand)
@@ -662,7 +662,7 @@ def play_hand(deck, dealer_hand, player_hand):
                     break
                 elif check_for_blackjack(dealer_hand.cards) and check_for_blackjack(player_hand.cards) == False:
                     time.sleep(1)
-                    print("\n" "The dealer has blackjack, \033[1;31;40mplayer loses\033[0m.")
+                    print("\n" f"The dealer has blackjack, \033[1;31;40m{player_hand.name} loses\033[0m.")
                     time.sleep(1)
                     player_hand.Show_Hand("final")
                     time.sleep(1)
@@ -672,7 +672,7 @@ def play_hand(deck, dealer_hand, player_hand):
                 elif check_for_blackjack(dealer_hand.cards) == False and check_for_blackjack(player_hand.cards):
                     time.sleep(1)
                     print("\n" f"\033[1;33;40m{player_hand.name}\033[0m has blackjack, the dealer does not,"
-                          " \033[1;31;40mplayer wins\033[0m.")
+                          f" \033[1;31;40mplayer wins\033[0m.")
                     time.sleep(1)
                     player_hand.Show_Hand("final")
                     time.sleep(1)
@@ -697,7 +697,7 @@ def play_hand(deck, dealer_hand, player_hand):
             Player_Bank = player_hand.Update_Bank("P", player_hand.hand_wager)
         elif check_for_blackjack(dealer_hand.cards) and check_for_blackjack(player_hand.cards) == False:
             time.sleep(1)
-            print("\n" "The dealer has blackjack, \033[1;31;40mplayer loses\033[0m.")
+            print("\n" f"The dealer has blackjack, \033[1;31;40m{player_hand.name} loses\033[0m.")
             time.sleep(1)
             player_hand.Show_Hand("final")
             time.sleep(1)
@@ -706,7 +706,7 @@ def play_hand(deck, dealer_hand, player_hand):
         elif check_for_blackjack(dealer_hand.cards) == False and check_for_blackjack(player_hand.cards):
             time.sleep(1)
             print("\n" f"\033[1;33;40m{player_hand.name}\033[0m has blackjack, the dealer does not,"
-                  " \033[1;31;40mplayer wins\033[0m.")
+                  f" \033[1;31;40mplayer wins\033[0m.")
             time.sleep(1)
             player_hand.Show_Hand("final")
             time.sleep(1)
