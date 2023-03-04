@@ -132,14 +132,13 @@ class Player_Hand:
     def Deposit(self):
         global Player_Bank
         while Player_Bank == 0:
-            Player_Bank = input("Enter a bank total to play with: ")
-            Player_Bank = float(Player_Bank)
-            if not isinstance(Player_Bank, float or int):
-                print("\n" f"Your entry of \033[1;31;40m{Player_Bank}\033[0m is not a number. Pleae re-enter"
-                      f" your total for your bank." "\n")
-                Player_Bank = 0
-                continue
-            elif isinstance(Player_Bank, float or int) and value_check("<=", float(Player_Bank), 0):
+            while True:
+                try:
+                    Player_Bank = float(input("Enter a bank total to play with: "))
+                    break
+                except ValueError:
+                    print("\n" f"Your input is not a number. Please try again." "\n")
+            if value_check("<=", float(Player_Bank), 0):
                 print("\n" f"Your entry of \033[1;31;40m{Player_Bank}\033[0m must be a positive number. Please"
                       f" re-enter your total for your bank." "\n")
                 Player_Bank = 0
@@ -560,7 +559,12 @@ def play_hand(deck, dealer_hand, player_hand):
     # Take bet for current hand
     player_hand.hand_wager = 0
     while player_hand.hand_wager == 0:
-        player_hand.hand_wager = float(input("Please enter a bet for your hand: "))
+        while True:
+            try:
+                player_hand.hand_wager = float(input("Please enter a bet for your hand: "))
+                break
+            except ValueError:
+                print("\n" f"Your input is not a number. Please try again." "\n")
         if player_hand.hand_wager > Player_Bank:
             print("\n" f"You have entered a wager of \033[1;31;40m{player_hand.hand_wager}\033[0m that is more"
                   f" than your bank of \033[1;31;40m{Player_Bank}\033[0m. Please re-enter your wager." "\n" )
