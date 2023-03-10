@@ -417,7 +417,7 @@ CMakeFiles/Stage_1.dir/main.cpp.o: /Users/taylor/Library/Mobile\ Documents/com~a
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/_types/_nl_item.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/__bsd_locale_defaults.h \
   /Users/taylor/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage\ 1/Headers/main.h \
-  /Users/taylor/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage\ 1/Headers/Arrays_Classes_Variables.h \
+  /Users/taylor/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage\ 1/Headers/Classes.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/random \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/cmath \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/math.h \
@@ -439,8 +439,6 @@ CMakeFiles/Stage_1.dir/main.cpp.o: /Users/taylor/Library/Mobile\ Documents/com~a
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/cmath:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/random:
-
-/Users/taylor/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage\ 1/Headers/Arrays_Classes_Variables.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/__bsd_locale_defaults.h:
 
@@ -1189,6 +1187,8 @@ CMakeFiles/Stage_1.dir/main.cpp.o: /Users/taylor/Library/Mobile\ Documents/com~a
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/__functional/function.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/__utility/move.h:
+
+/Users/taylor/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage\ 1/Headers/Classes.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/__algorithm/pop_heap.h:
 

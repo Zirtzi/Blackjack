@@ -1,5 +1,5 @@
-#ifndef STAGE_1_ARRAYS_CLASSES_VARIABLES_H
-#define STAGE_1_ARRAYS_CLASSES_VARIABLES_H
+#ifndef STAGE_1_CLASSES_H
+#define STAGE_1_CLASSES_H
 #include <algorithm>
 #include <random>
 #include <stack>
@@ -8,13 +8,10 @@
 #include <vector>
 #include "Functions.h"
 using namespace std;
-// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- Arrays ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- //
-// Suits and Ranks of cards
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- Classes & Arrays ---- ---- ---- ---- ---- ---- ---- ---- ---- //
 string Suits[4] = {"Clubs", "Diamonds", "Hearts", "Spades"};
 string Ranks[13] = {"Ace", "2", "3", "4", "5", "6", "7", "8",
                     "9", "10", "Jack", "Queen", "King"};
-
-// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- Classes ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- //
 // Card class
 class Card {
 public:
@@ -89,8 +86,8 @@ public:
     Deck(int decks) {
         this->num_of_decks = decks;
         for (int i = 1; i <= decks; i++) {
-            for (const auto & rank: Ranks) {
-                for (const auto & suit: Suits) {
+            for (const auto & rank : Ranks) {
+                for (const auto & suit : Suits) {
                     this->cards.push_back(Card(rank, suit));
                 }
             }
@@ -169,6 +166,10 @@ public:
                 << " - " << drawn_card << endl;
                 card_dealt_number += 1;
             }
+            this->rigged_cards = this->returned_cards;
+            reverse(this->rigged_cards.begin(), this->rigged_cards.end());
+            cout << "\n" << color_text(33, to_string(this->rigged_cards.size()))
+            << " cards in rigged deck." << endl;
         }
         else {}
     }
@@ -179,4 +180,69 @@ public:
         return os;
     }
 };
-#endif //STAGE_1_ARRAYS_CLASSES_VARIABLES_H
+
+// Hand Class
+class Hand{
+public:
+    // Public variables
+    vector<Card> cards;
+    string name;
+    int hand_value;
+    float hand_wager;
+    // Constructor
+    Hand(string name = "") {
+        this->hand_value = 0;
+        this->hand_wager = 0;
+    }
+    // Add cards to hand method
+    void Add_Card_To_Hand(Card card) {
+        this->cards.push_back(card);
+    }
+    // Add hand total method
+    int Add_Hand_Total() {
+        int ace_count = 0;
+        int running_hand_value = 0;
+        for (const Card & current_card : this->cards) {
+            if (current_card.rank == color_text(32, "Ace")) {
+                ace_count += 1;
+            }
+            else {}
+        }
+        for (Card & current_card : this->cards) {
+            if (ace_count == 1) {
+                if (current_card.rank == color_text(32, "Ace")) {
+                    current_card.Set_New_Value(11);
+                }
+                else {}
+            }
+            else if (ace_count > 1) {
+                if (current_card.rank == color_text(32, "Ace")) {
+                    current_card.Set_New_Value(1);
+                }
+                else {}
+            }
+            else {}
+            running_hand_value += current_card.Value_of_Card();
+            ace_count -= 1;
+        }
+        if (running_hand_value > 21) {
+            running_hand_value = 0;
+            for (Card & current_card : this->cards) {
+                if (current_card.rank == color_text(32, "Ace")) {
+                    current_card.Set_New_Value(1);
+                    running_hand_value += current_card.Value_of_Card();
+                }
+                else {}
+            }
+        }
+        else {}
+        this->hand_value = running_hand_value;
+        return this->hand_value;
+    }
+    // Hit hand method
+    Hand Hit_Hand(Deck & deck) {
+        Add_Card_To_Hand(deck.Draw());
+        return Hand();
+    }
+};
+#endif //STAGE_1_CLASSES_H
