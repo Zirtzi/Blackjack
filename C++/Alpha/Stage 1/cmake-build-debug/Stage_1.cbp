@@ -80,7 +80,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/Users/taylor/Library/Mobile Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage 1/Headers/Classes.h">
+		<Unit filename="/Users/taylor/Library/Mobile Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage 1/Headers/Classes_Variables.h">
 			<Option target="Stage_1"/>
 		</Unit>
 		<Unit filename="/Users/taylor/Library/Mobile Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage 1/Headers/Functions.h">

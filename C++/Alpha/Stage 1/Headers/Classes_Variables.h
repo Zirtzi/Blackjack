@@ -1,17 +1,22 @@
-#ifndef STAGE_1_CLASSES_H
-#define STAGE_1_CLASSES_H
+#ifndef STAGE_1_CLASSES_VARIABLES_H
+#define STAGE_1_CLASSES_VARIABLES_H
 #include <algorithm>
+#include <cctype>
 #include <random>
 #include <stack>
+#include <stdexcept>
 #include <string>
 #include <typeinfo>
 #include <vector>
 #include "Functions.h"
 using namespace std;
-// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- Classes & Arrays ---- ---- ---- ---- ---- ---- ---- ---- ---- //
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  Arrays ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  //
 string Suits[4] = {"Clubs", "Diamonds", "Hearts", "Spades"};
 string Ranks[13] = {"Ace", "2", "3", "4", "5", "6", "7", "8",
                     "9", "10", "Jack", "Queen", "King"};
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- Global Variables ---- ---- ---- ---- ---- ---- ---- ---- ----  //
+float Player_Bank;
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  Classes ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  //
 // Card class
 class Card {
 public:
@@ -73,7 +78,6 @@ public:
         return os;
     }
 };
-
 // Deck Class
 class Deck {
 public:
@@ -92,12 +96,6 @@ public:
                 }
             }
         }
-    }
-    // Shuffle method
-    void Shuffle() {
-        random_device rd;
-        std::mt19937 g(rd());
-        shuffle(this->cards.begin(), this->cards.end(), g);
     }
     // Draw method
     Card Draw() {
@@ -173,6 +171,12 @@ public:
         }
         else {}
     }
+    // Shuffle method
+    void Shuffle() {
+        random_device rd;
+        std::mt19937 g(rd());
+        shuffle(this->cards.begin(), this->cards.end(), g);
+    }
     // Representation method
     friend ostream & operator << (ostream & os, const Deck & deck) {
         os << "\n" "Deck of " << color_text(33, to_string(deck.cards.size())) << " cards and "
@@ -180,7 +184,6 @@ public:
         return os;
     }
 };
-
 // Hand Class
 class Hand{
 public:
@@ -239,10 +242,68 @@ public:
         this->hand_value = running_hand_value;
         return this->hand_value;
     }
+    float Deposit() {
+        Player_Bank = 0;
+        while (Player_Bank == 0) {
+            while (true) {
+                try {
+                    string deposit;
+                    bool hasDecimal = false;
+                    int decimal_counter = 0;
+                    cout << "Please enter an amount you'd like to deposit into your bank: ";
+                    getline(cin, deposit);
+                    for (int i = 0; i <= deposit.length(); i++) {
+                        if (deposit[i] == '.') {
+                            decimal_counter += 1;
+                        }
+                        else {}
+                    }
+                    for (char c : deposit) {
+                        if (deposit.front() != '-') {
+                            if (!isdigit(c)) {
+                                if (c == '.' && !hasDecimal) {
+                                    hasDecimal = true;
+                                }
+                                else {
+                                    throw invalid_argument("\n"
+                                    + color_text(31, "Invalid entry") + " of " + color_text(31, deposit)
+                                    + ". Please re-enter your bank total." "\n");
+                                }
+                            }
+                            else {}
+                        }
+                        else if (deposit.front() == '-') {
+                            if (isdigit(c) && decimal_counter <= 1) {
+                                throw invalid_argument("\n"
+                                + color_text(31, "Negative entry") + " of " + color_text(31, deposit)
+                                + ". Please enter a positive value for your bank total." "\n");
+                            }
+                            else if (!isdigit(c) || decimal_counter > 1) {
+                                throw invalid_argument("\n"
+                                + color_text(31, "Invalid entry") + " of " + color_text(31, deposit)
+                                + ". Please re-enter your bank total." "\n");
+                            }
+                            else {}
+                        }
+                    }
+                    Player_Bank = stof(deposit);
+                    if (Player_Bank == 0) {
+                        cout << "\n" << color_text(31, "Invalid entry") << " of "
+                        << color_text(31, to_string(Player_Bank)) << ". Please enter a positive value"
+                        << " for a bank entry." "\n" << endl;
+                    }
+                    else {break;}
+                }
+                catch (const invalid_argument & e) {
+                    cout << e.what() << endl;
+                }
+            }
+        }
+    }
     // Hit hand method
     Hand Hit_Hand(Deck & deck) {
         Add_Card_To_Hand(deck.Draw());
         return Hand();
     }
 };
-#endif //STAGE_1_CLASSES_H
+#endif //STAGE_1_CLASSES_VARIABLES_H

@@ -1,7 +1,7 @@
 #ifndef STAGE_1_FUNCTIONS_H
 #define STAGE_1_FUNCTIONS_H
 #include <string>
-#include "Classes.h"
+#include "Classes_Variables.h"
 using namespace std;
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- Methods ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- //
 // Color Text Method
