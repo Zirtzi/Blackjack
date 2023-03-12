@@ -3,8 +3,5 @@
 using namespace std;
 
 int main() {
-    Hand hand;
-    hand.Deposit();
-    cout << Player_Bank << endl;
     return 0;
 }

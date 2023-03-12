@@ -2,7 +2,10 @@
 #define STAGE_1_CLASSES_VARIABLES_H
 #include <algorithm>
 #include <cctype>
+#include <cmath>
+#include <iomanip>
 #include <random>
+#include <sstream>
 #include <stack>
 #include <stdexcept>
 #include <string>
@@ -193,9 +196,10 @@ public:
     int hand_value;
     float hand_wager;
     // Constructor
-    Hand(string name = "") {
+    Hand(string player_name = "") {
         this->hand_value = 0;
         this->hand_wager = 0;
+        this->name = color_text(34, player_name);
     }
     // Add cards to hand method
     void Add_Card_To_Hand(Card card) {
@@ -249,19 +253,12 @@ public:
                 try {
                     string deposit;
                     bool hasDecimal = false;
-                    int decimal_counter = 0;
                     cout << "Please enter an amount you'd like to deposit into your bank: ";
                     getline(cin, deposit);
-                    for (int i = 0; i <= deposit.length(); i++) {
-                        if (deposit[i] == '.') {
-                            decimal_counter += 1;
-                        }
-                        else {}
-                    }
-                    for (char c : deposit) {
-                        if (deposit.front() != '-') {
-                            if (!isdigit(c)) {
-                                if (c == '.' && !hasDecimal) {
+                    if (deposit.front() != '-') {
+                        for (int i = 0; i < deposit.length(); i++) {
+                            if (!isdigit(deposit[i])) {
+                                if (deposit[i] == '.' && !hasDecimal) {
                                     hasDecimal = true;
                                 }
                                 else {
@@ -270,40 +267,62 @@ public:
                                     + ". Please re-enter your bank total." "\n");
                                 }
                             }
-                            else {}
-                        }
-                        else if (deposit.front() == '-') {
-                            if (isdigit(c) && decimal_counter <= 1) {
-                                throw invalid_argument("\n"
-                                + color_text(31, "Negative entry") + " of " + color_text(31, deposit)
-                                + ". Please enter a positive value for your bank total." "\n");
-                            }
-                            else if (!isdigit(c) || decimal_counter > 1) {
-                                throw invalid_argument("\n"
-                                + color_text(31, "Invalid entry") + " of " + color_text(31, deposit)
-                                + ". Please re-enter your bank total." "\n");
+                            else if (isdigit(deposit[i])) {
+                                continue;
                             }
                             else {}
                         }
                     }
+                    else if (deposit.front() == '-') {
+                        for (int i = 1; i < deposit.length(); i++) {
+                            if (!isdigit(deposit[i])) {
+                                if (deposit[i] == '.' && !hasDecimal) {
+                                    hasDecimal = true;
+                                }
+                                else {
+                                    throw invalid_argument("\n"
+                                    + color_text(31, "Invalid entry") + " of " + color_text(31, deposit)
+                                    + ". Please re-enter your bank total." "\n"
+                                    );
+                                }
+                            }
+                            else if (isdigit(deposit[i])) {
+                                continue;
+                            }
+                            else {}
+                        }
+                        throw invalid_argument("\n"
+                        + color_text(31, "Negative entry") + " of " + color_text(31, deposit)
+                        + ". Please enter a positive value for a bank total" "\n"
+                        );
+                    }
+                    else {}
                     Player_Bank = stof(deposit);
-                    if (Player_Bank == 0) {
-                        cout << "\n" << color_text(31, "Invalid entry") << " of "
-                        << color_text(31, to_string(Player_Bank)) << ". Please enter a positive value"
-                        << " for a bank entry." "\n" << endl;
+                    Player_Bank = round(Player_Bank * 100) / 100;
+                    cout << Player_Bank << endl;
+                    if (Player_Bank > 0) {
+                        break;
                     }
-                    else {break;}
+                    else if (Player_Bank < 0) {
+                        continue;
+                    }
                 }
                 catch (const invalid_argument & e) {
                     cout << e.what() << endl;
                 }
             }
         }
+        ostringstream oss;
+        oss << fixed << setprecision(2) << Player_Bank;
+        string Bank_of_Player = oss.str();
+        cout << "\n" << this->name << " has decided to start with: "
+        << color_text(33, Bank_of_Player) << "\n" << endl;
+        return Player_Bank;
     }
     // Hit hand method
     Hand Hit_Hand(Deck & deck) {
         Add_Card_To_Hand(deck.Draw());
-        return Hand();
+        return Hand(this->name);
     }
 };
 #endif //STAGE_1_CLASSES_VARIABLES_H
