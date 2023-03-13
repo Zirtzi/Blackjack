@@ -3,4 +3,4 @@ project(Stage_1)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(Stage_1 main.cpp Headers/main.h Headers/Classes_Variables.h Headers/Functions.h)
+add_executable(Stage_1 main.cpp Headers/main.h Headers/Structure.h Headers/Includes.h)

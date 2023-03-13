@@ -1,24 +1,106 @@
-#ifndef STAGE_1_CLASSES_VARIABLES_H
-#define STAGE_1_CLASSES_VARIABLES_H
-#include <algorithm>
-#include <cctype>
-#include <cmath>
-#include <iomanip>
-#include <random>
-#include <sstream>
-#include <stack>
-#include <stdexcept>
-#include <string>
-#include <typeinfo>
-#include <vector>
-#include "Functions.h"
+#ifndef STAGE_1_STRUCTURE_H
+#define STAGE_1_STRUCTURE_H
+#include "Includes.h"
 using namespace std;
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  Arrays ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  //
 string Suits[4] = {"Clubs", "Diamonds", "Hearts", "Spades"};
 string Ranks[13] = {"Ace", "2", "3", "4", "5", "6", "7", "8",
                     "9", "10", "Jack", "Queen", "King"};
-// ---- ---- ---- ---- ---- ---- ---- ---- ---- Global Variables ---- ---- ---- ---- ---- ---- ---- ---- ----  //
-float Player_Bank;
+// ---- ---- ---- ---- ---- ---- ---- ---- ----  Independent Methods ---- ---- ---- ---- ---- ---- ---- ---- //
+// Color Text Method
+string color_text(int a, string text) {
+    string code;
+    switch (a) {
+        case 31:
+            code = "\033[31m"; // Red Text
+            break;
+        case 32:
+            code = "\033[32m"; // Green Text
+            break;
+        case 33:
+            code = "\033[33m"; // Yellow Text
+            break;
+        case 34:
+            code = "\033[34m"; // Blue Text
+            break;
+        case 35:
+            code = "\033[35m"; // Purple Text
+            break;
+        case 36:
+            code = "\033[36m"; // Cyan Text
+            break;
+        case 37:
+            code = "\033[37m"; // White Text
+            break;
+        default:
+            code = "\033[0m"; // Default Text
+            break;
+    }
+    return code + text + "\033[0m";
+}
+// String to float conversion method
+string float_validation(string entry) {
+    string result = "";
+    bool has_decimal = false;
+    if (entry.front() != '-') {
+        for (int i = 0; i < entry.length(); i++) {
+            if (!isdigit(entry[i])) {
+                if (entry[i] == '.' && !has_decimal) {
+                    has_decimal = true;
+                }
+                else {
+                    // Failed Non-Negative Value
+                    result = "FNNV";
+                    return result;
+                }
+            }
+            else if (isdigit(entry[i])) {
+                continue;
+            }
+            else {}
+        }
+    }
+    else if (entry.front() == '-') {
+        for (int i = 1; i < entry.length(); i++) {
+            if (!isdigit(entry[i])) {
+                if (entry[i] == '.' && !has_decimal) {
+                    has_decimal = true;
+                }
+                else {
+                    // Failed Negative Value 1
+                    result = "FNV1";
+                    return result;
+                }
+            }
+            else if (isdigit(entry[i])) {
+                continue;
+            }
+            else {}
+        }
+        // Failed Negative Value 2
+        result = "FNV2";
+        return result;
+    }
+    else {}
+    result = "Passed";
+    return result;
+}
+// Round values to string method
+string round_to_string(float entry_value) {
+    ostringstream oss;
+    oss << fixed << setprecision(2) << entry_value;
+    string return_string = oss.str();
+    return return_string;
+}
+// Round wager / bank method
+float round_wager_bank(float entry_value) {
+    entry_value = round(entry_value * 100) / 100;
+    return entry_value;
+}
+// Sleep method
+void time_sleep(long sleep_time) {
+    this_thread::sleep_for(chrono::seconds(sleep_time));
+}
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  Classes ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  //
 // Card class
 class Card {
@@ -82,7 +164,7 @@ public:
     }
 };
 // Deck Class
-class Deck {
+class Decks {
 public:
     // Public variables
     vector<Card> cards;
@@ -90,7 +172,7 @@ public:
     vector<Card> rigged_cards;
     int num_of_decks;
     // Constructor
-    Deck(int decks) {
+    Decks(int decks) {
         this->num_of_decks = decks;
         for (int i = 1; i <= decks; i++) {
             for (const auto & rank : Ranks) {
@@ -181,7 +263,7 @@ public:
         shuffle(this->cards.begin(), this->cards.end(), g);
     }
     // Representation method
-    friend ostream & operator << (ostream & os, const Deck & deck) {
+    friend ostream & operator << (ostream & os, const Decks & deck) {
         os << "\n" "Deck of " << color_text(33, to_string(deck.cards.size())) << " cards and "
         << color_text(33, to_string(deck.num_of_decks)) << " deck(s)." << endl;
         return os;
@@ -191,31 +273,36 @@ public:
 class Hand{
 public:
     // Public variables
-    vector<Card> cards;
-    string name;
-    int hand_value;
-    float hand_wager;
+    struct Player {
+        string name;
+        float bank_total;
+        int hand_cards_total;
+        float hand_wager;
+        vector<Card> cards;
+    };
+    Player current_player;
     // Constructor
-    Hand(string player_name = "") {
-        this->hand_value = 0;
-        this->hand_wager = 0;
-        this->name = color_text(34, player_name);
+    Hand(Player current_player) {
+        this->current_player.name = "";
+        this->current_player.bank_total = 0;
+        this->current_player.hand_cards_total = 0;
+        this->current_player.hand_wager = 0;
     }
     // Add cards to hand method
     void Add_Card_To_Hand(Card card) {
-        this->cards.push_back(card);
+        this->current_player.cards.push_back(card);
     }
     // Add hand total method
     int Add_Hand_Total() {
         int ace_count = 0;
         int running_hand_value = 0;
-        for (const Card & current_card : this->cards) {
+        for (const Card & current_card : this->current_player.cards) {
             if (current_card.rank == color_text(32, "Ace")) {
                 ace_count += 1;
             }
             else {}
         }
-        for (Card & current_card : this->cards) {
+        for (Card & current_card : this->current_player.cards) {
             if (ace_count == 1) {
                 if (current_card.rank == color_text(32, "Ace")) {
                     current_card.Set_New_Value(11);
@@ -234,7 +321,7 @@ public:
         }
         if (running_hand_value > 21) {
             running_hand_value = 0;
-            for (Card & current_card : this->cards) {
+            for (Card & current_card : this->current_player.cards) {
                 if (current_card.rank == color_text(32, "Ace")) {
                     current_card.Set_New_Value(1);
                     running_hand_value += current_card.Value_of_Card();
@@ -246,13 +333,13 @@ public:
             }
         }
         else {}
-        this->hand_value = running_hand_value;
-        return this->hand_value;
+        this->current_player.hand_cards_total = running_hand_value;
+        return this->current_player.hand_cards_total;
     }
     // Deposit method
     float Deposit() {
-        Player_Bank = 0;
-        while (Player_Bank == 0) {
+        current_player.bank_total = 0;
+        while (current_player.bank_total == 0) {
             while (true) {
                 try {
                     string deposit;
@@ -276,7 +363,7 @@ public:
                         + ". Please enter a positive value for a bank total." "\n");
                     }
                     else if (try_result == "Passed") {
-                        Player_Bank = round_wager_bank(stof(deposit));
+                        current_player.bank_total = round_wager_bank(stof(deposit));
                         break;
                     }
                     else {}
@@ -284,19 +371,19 @@ public:
                 catch (const invalid_argument & e) {
                     cout << e.what() << endl;
                 }
-                if (Player_Bank > 0) {
+                if (current_player.bank_total > 0) {
                     break;
                 }
-                else if (Player_Bank < 0) {
+                else if (current_player.bank_total < 0) {
                     continue;
                 }
             }
         }
         // time_sleep(1.0);
-        string Bank_of_Player = round_to_string(Player_Bank);
-        cout << "\n" << this->name << " has decided to start with: "
+        string Bank_of_Player = round_to_string(current_player.bank_total);
+        cout << "\n" << this->current_player.name << " has decided to start with: "
         << color_text(33, Bank_of_Player) << "\n" << endl;
-        return Player_Bank;
+        return current_player.bank_total;
     }
     // Hand name method
     string Hand_Name() {
@@ -304,14 +391,14 @@ public:
         cout << "\n" "Enter a name for this hand: ";
         getline(cin, hand_name);
         cout << endl;
-        this->name = color_text(34, hand_name);
+        this->current_player.name = color_text(34, hand_name);
         // time_sleep(1.0);
-        return this->name;
+        return this->current_player.name;
     }
     // Hit hand method
-    Hand Hit_Hand(Deck & deck) {
+    Hand Hit_Hand(Decks & deck) {
         Add_Card_To_Hand(deck.Draw());
-        return Hand();
+        return Hand(current_player);
     }
     // Insurance method
     float Insurance(float wager) {
@@ -334,11 +421,11 @@ public:
         }
         if (insurance_decision) {
             wager = round_wager_bank(0.5*wager);
-            Player_Bank -= wager;
+            current_player.bank_total -= wager;
             return wager;
         }
         else if (!insurance_decision) {
-            Player_Bank = Player_Bank;
+            current_player.bank_total = current_player.bank_total;
             return wager;
         }
         else {}
@@ -371,15 +458,14 @@ public:
                         }
                         else {}
                     }
-                    else if ((try_result == "Passed") && (stof(input_wager) > Player_Bank)) {
+                    else if ((try_result == "Passed") && (stof(input_wager) > current_player.bank_total)) {
                         string string_wager = round_to_string(round_wager_bank(stof(input_wager)));
-                        string string_PB = round_to_string(Player_Bank);
+                        string string_PB = round_to_string(current_player.bank_total);
                         // time_sleep(1.0);
                         throw invalid_argument("\n"
                         + color_text(31, "Invalid wager") + " of " + color_text(31, string_wager)
                         + " due to wager being larger than bank total of "
-                        + color_text(31, string_PB) + ". Please re-enter your wager."
-                        );
+                        + color_text(31, string_PB) + ". Please re-enter your wager.");
                     }
                     else {
                         wager = round_wager_bank(stof(input_wager));
@@ -392,101 +478,105 @@ public:
             }
         }
         // time_sleep(1.0);
-        this->hand_wager = round_wager_bank(wager);
-        Player_Bank -= this->hand_wager;
-        return this->hand_wager;
+        this->current_player.hand_wager = round_wager_bank(wager);
+        current_player.bank_total -= this->current_player.hand_wager;
+        return this->current_player.hand_wager;
     }
     // Show hand method
     void Show_Hand(string option = "", string dealer_show = "") {
-        if (this->name != color_text(34, "Dealer")) {
+        if (this->current_player.name != color_text(34, "Dealer")) {
             if (option == "") {
                 option = "current";
-                cout << this->name << "'s " << color_text(31, option) << " hand: [";
-                for (int i = 0; i < cards.size(); i++) {
-                    if (i == cards.size() - 1) {
-                        cout << cards[i] << "]";
+                cout << this->current_player.name << "'s " << color_text(31, option) << " hand: [";
+                for (int i = 0; i < this->current_player.cards.size(); i++) {
+                    if (i == this->current_player.cards.size() - 1) {
+                        cout << this->current_player.cards[i] << "]";
                     }
                     else {
-                        cout << cards[i] << " , ";
+                        cout << this->current_player.cards[i] << " , ";
                     }
                 }
                 Add_Hand_Total();
-                string Rounded_Wager = round_to_string(hand_wager);
-                string Bank_of_Player = round_to_string(Player_Bank);
+                string Rounded_Wager = round_to_string(this->current_player.hand_wager);
+                string Bank_of_Player = round_to_string(current_player.bank_total);
                 cout << color_text(36, " Hand Total") << ": "
-                << color_text(36, to_string(hand_value)) << " , " << color_text(31, "Hand Wager")
-                << ": " << color_text(31, Rounded_Wager) << " , " << color_text(33, "Bank Total")
-                << ": " << color_text(33, Bank_of_Player);
+                << color_text(36, to_string(this->current_player.hand_cards_total)) << " , "
+                << color_text(31, "Hand Wager") << ": " << color_text(31, Rounded_Wager)
+                << " , " << color_text(33, "Bank Total") << ": " << color_text(33, Bank_of_Player);
                 // time_sleep(1.0);
             }
             else if (option != "") {
-                cout << this->name << "'s " << color_text(31, option) << " hand: [";
-                for (int i = 0; i < cards.size(); i++) {
-                    if (i == cards.size() - 1) {
-                        cout << cards[i] << "]";
+                cout << this->current_player.name << "'s " << color_text(31, option) << " hand: [";
+                for (int i = 0; i < this->current_player.cards.size(); i++) {
+                    if (i == this->current_player.cards.size() - 1) {
+                        cout << this->current_player.cards[i] << "]";
                     }
                     else {
-                        cout << cards[i] << " , ";
+                        cout << this->current_player.cards[i] << " , ";
                     }
                 }
                 Add_Hand_Total();
-                string Rounded_Wager = round_to_string(hand_wager);
-                string Bank_of_Player = round_to_string(Player_Bank);
+                string Rounded_Wager = round_to_string(this->current_player.hand_wager);
+                string Bank_of_Player = round_to_string(current_player.bank_total);
                 cout << color_text(36, " Hand Total") << ": "
-                << color_text(36, to_string(hand_value)) << " , " << color_text(31, "Hand Wager")
-                << ": " << color_text(31, Rounded_Wager) << " , " << color_text(33, "Bank Total")
-                << ": " << color_text(33, Bank_of_Player);
+                << color_text(36, to_string(this->current_player.hand_cards_total)) << " , " <<
+                color_text(31, "Hand Wager") << ": " << color_text(31, Rounded_Wager) << " , "
+                << color_text(33, "Bank Total") << ": " << color_text(33, Bank_of_Player);
                 // time_sleep(1.0);
             }
             else {}
         }
-        else if (this->name == color_text(34, "Dealer")) {
+        else if (this->current_player.name == color_text(34, "Dealer")) {
             if (option == "") {
                 if (dealer_show == "") {
                     option = "current";
-                    cout << color_text(31, this->name) << "'s " << color_text(31, option)
-                    << " hand: [Hidden, " << cards.back() << "]" << color_text(36, " Hand Total") << ": "
-                    << color_text(36, to_string(cards.back().card_value));
+                    cout << color_text(31, this->current_player.name) << "'s " << color_text(31, option)
+                    << " hand: [Hidden, " << this->current_player.cards.back() << "]"
+                    << color_text(36, " Hand Total") << ": "
+                    << color_text(36, to_string(this->current_player.cards.back().card_value));
                     // time_sleep(1.0);
                 }
                 else if (dealer_show != "") {
                     option = "current";
-                    cout << color_text(31, this->name) << "'s " << color_text(31, option) << " hand: [";
-                    for (int i = 0; i < cards.size(); i++) {
-                        if (i == cards.size() - 1) {
-                            cout << cards[i] << "]";
+                    cout << color_text(31, this->current_player.name) << "'s " << color_text(31, option)
+                    << " hand: [";
+                    for (int i = 0; i < this->current_player.cards.size(); i++) {
+                        if (i == this->current_player.cards.size() - 1) {
+                            cout << this->current_player.cards[i] << "]";
                         }
                         else {
-                            cout << cards[i] << " , ";
+                            cout << this->current_player.cards[i] << " , ";
                         }
                     }
                     Add_Hand_Total();
                     cout << color_text(36, " Hand Total") << ": "
-                    << color_text(36, to_string(hand_value));
+                    << color_text(36, to_string(this->current_player.hand_cards_total));
                     // time_sleep(1.0);
                 }
                 else {}
             }
             else if (option != "") {
                 if (dealer_show == "") {
-                    cout << color_text(31, this->name) << "'s " << color_text(31, option)
-                         << " hand: [Hidden, " << cards.back() << "]" << color_text(36, " Hand Total") << ": "
-                         << color_text(36, to_string(cards.back().card_value));
+                    cout << color_text(31, this->current_player.name) << "'s " << color_text(31, option)
+                         << " hand: [Hidden, " << this->current_player.cards.back() << "]"
+                         << color_text(36, " Hand Total") << ": "
+                         << color_text(36, to_string(this->current_player.cards.back().card_value));
                     // time_sleep(1.0);
                 }
                 else if (dealer_show != "") {
-                    cout << color_text(31, this->name) << "'s " << color_text(31, option) << " hand: [";
-                    for (int i = 0; i < cards.size(); i++) {
-                        if (i == cards.size() - 1) {
-                            cout << cards[i] << "]";
+                    cout << color_text(31, this->current_player.name) << "'s " << color_text(31, option)
+                    << " hand: [";
+                    for (int i = 0; i < this->current_player.cards.size(); i++) {
+                        if (i == this->current_player.cards.size() - 1) {
+                            cout << this->current_player.cards[i] << "]";
                         }
                         else {
-                            cout << cards[i] << " , ";
+                            cout << this->current_player.cards[i] << " , ";
                         }
                     }
                     Add_Hand_Total();
                     cout << color_text(36, " Hand Total") << ": "
-                         << color_text(36, to_string(hand_value));
+                         << color_text(36, to_string(this->current_player.hand_cards_total));
                     // time_sleep(1.0);
                 }
                 else {}
@@ -499,20 +589,20 @@ public:
     float Update_Bank(string choice, float wager) {
         switch (choice[0]) {
             case 'W':
-                Player_Bank += 2.0*wager;
-                return Player_Bank;
+                current_player.bank_total += 2.0*wager;
+                return current_player.bank_total;
             case 'L':
-                return Player_Bank;
+                return current_player.bank_total;
             case 'P':
-                Player_Bank += wager;
-                return Player_Bank;
+                current_player.bank_total += wager;
+                return current_player.bank_total;
             case 'B':
-                Player_Bank += wager + 1.5*wager;
-                return Player_Bank;
+                current_player.bank_total += wager + 1.5*wager;
+                return current_player.bank_total;
             default:
-                Player_Bank += wager;
-                return Player_Bank;
+                current_player.bank_total += wager;
+                return current_player.bank_total;
         }
     }
 };
-#endif //STAGE_1_CLASSES_VARIABLES_H
+#endif //STAGE_1_STRUCTURE_H

@@ -1,0 +1,16 @@
+#ifndef STAGE_1_INCLUDES_H
+#define STAGE_1_INCLUDES_H
+#include <algorithm>
+#include <cctype>
+#include <chrono>
+#include <cmath>
+#include <iomanip>
+#include <random>
+#include <sstream>
+#include <stack>
+#include <stdexcept>
+#include <string>
+#include <thread>
+#include <typeinfo>
+#include <vector>
+#endif //STAGE_1_INCLUDES_H

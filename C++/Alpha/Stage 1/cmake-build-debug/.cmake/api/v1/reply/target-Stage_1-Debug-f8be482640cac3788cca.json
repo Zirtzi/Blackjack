@@ -113,12 +113,12 @@
 		},
 		{
 			"backtrace" : 1,
-			"path" : "Headers/Classes_Variables.h",
+			"path" : "Headers/Structure.h",
 			"sourceGroupIndex" : 1
 		},
 		{
 			"backtrace" : 1,
-			"path" : "Headers/Functions.h",
+			"path" : "Headers/Includes.h",
 			"sourceGroupIndex" : 1
 		}
 	],
