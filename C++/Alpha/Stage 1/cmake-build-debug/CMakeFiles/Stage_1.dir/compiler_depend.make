@@ -429,7 +429,8 @@ CMakeFiles/Stage_1.dir/main.cpp.o: /Users/taylor/Library/Mobile\ Documents/com~a
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/sstream \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/stack \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/deque \
-  /Users/taylor/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage\ 1/Headers/Functions.h
+  /Users/taylor/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage\ 1/Headers/Functions.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/thread
 
 
 /Users/taylor/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/General/Technology/Projects/Blackjack/C++/Alpha/Stage\ 1/Headers/Functions.h:
@@ -887,6 +888,8 @@ CMakeFiles/Stage_1.dir/main.cpp.o: /Users/taylor/Library/Mobile\ Documents/com~a
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/__functional/perfect_forward.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/arm/_mcontext.h:
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/thread:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1/__functional/binary_negate.h:
 
